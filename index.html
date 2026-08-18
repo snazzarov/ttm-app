@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Train and Tests Mind (TTM)</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Базовые стили */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Кнопки */
+        .btn {
+            background-color: #3390ec;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            outline: none;
+        }
+
+        .btn:focus {
+            box-shadow: 0 0 0 3px rgba(51, 144, 236, 0.5);
+        }
+
+        /* Визуальное выделение фокуса */
+        .btn:active {
+            background-color: #2b7bb9;
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-next {
+            background-color: #34c759;
+            font-size: 18px;
+            padding: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-next:focus {
+            box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.5);
+        }
+
+        .btn-next:active {
+            background-color: #2da94d;
+            transform: translateY(2px);
+        }
+
+        .btn-stop {
+            background-color: #ff3b30;
+            font-size: 18px;
+            padding: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-stop:focus {
+            box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.5);
+        }
+
+        .btn-stop:active {
+            background-color: #cc2e26;
+            transform: translateY(2px);
+        }
+
+        .btn-copy {
+            background-color: #ff9500;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .btn-copy:focus {
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.5);
+        }
+
+        .btn-copy:active {
+            background-color: #e08300;
+        }
+
+        /* Экраны */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Глобальная кнопка Help */
+        .help-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        /* Стартовый экран */
+        .start-container {
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 40px;
+        }
+
+        .user-info {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        /* Экран тренировки */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            width: 100%;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .exercise {
+            font-size: 32px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .math-input {
+            width: 60px;
+            height: 40px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #3390ec;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .math-input:focus {
+            background-color: #f0f8ff;
+            border-color: #34c759;
+        }
+
+        .math-input::placeholder {
+            color: #aaa;
+            font-weight: normal;
+        }
+
+        .remainder-group {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .remainder-group.active {
+            display: flex;
+        }
+
+        /* Экраны Тестов */
+        .test-container {
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .stopwatch {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+            color: #333;
+        }
+
+        .instruction {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Сетка для слов (Тест 2) */
+        .words-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            font-size: 14px;
+            text-align: left;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .word-item {
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Сетка Струпа (Тест 3) */
+        .stroop-grid {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stroop-word {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            border-color: #3390ec;
+            outline: none;
+        }
+
+        .copy-area {
+            background: #f5f5f5;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px dashed #aaa;
+            margin-top: 15px;
+            height: 150px;
+            outline: none;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 200;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .history-item {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .error-text {
+            color: red;
+            font-weight: bold;
+        }
+
+        .correct-text {
+            color: green;
+        }
+
+        .summary-card {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #3390ec;
+            text-align: left;
+        }
+
+        /* Стили для текста в справке */
+        .help-content h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #3390ec;
+            font-size: 18px;
+        }
+
+        .help-content p,
+        .help-content li {
+            line-height: 1.5;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .help-content ol {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="help-btn" onclick="openHelp()">?</button>
+
+    <!-- 1. СТАРТОВЫЙ ЭКРАН -->
+    <div id="start-screen" class="screen active">
+        <div class="start-container">
+            <h1>TTM</h1>
+            <p>Train and Tests Mind</p>
+            <div class="user-info">
+                <div><b>ID:</b> <span id="ui-user-id">Загрузка...</span></div>
+                <div><b>Имя:</b> <span id="ui-user-name">Загрузка...</span></div>
+            </div>
+            <div class="input-group">
+                <label for="module-input">Введите номер (1-5 тренировка, 6 тест):</label>
+                <input type="number" id="module-input" min="1" max="6" placeholder="Например: 1">
+            </div>
+            <button class="btn btn-next" onclick="startModule()">Запустить</button>
+        </div>
+    </div>
+
+    <!-- 2. ЭКРАН ТРЕНИРОВКИ -->
+    <div id="training-screen" class="screen" style="width: 100%;">
+        <div class="header">
+            <div class="header-info">
+                <span id="timer">Время: 00:00</span>
+                <span id="error-count">Ошибок: 0</span>
+                <span id="progress">Упражнение: 1/100</span>
+            </div>
+            <button class="btn btn-small" onclick="pauseTraining()">Пауза</button>
+        </div>
+        <div class="workspace">
+            <div class="exercise">
+                <span id="equation">A + B =</span>
+                <input type="text" id="input-x" class="math-input" inputmode="numeric" autocomplete="off">
+                <div class="remainder-group" id="remainder-group">
+                    <span>ост</span>
+                    <input type="text" id="input-y" class="math-input" inputmode="numeric" autocomplete="off"
+                        placeholder="0">
+                </div>
+            </div>
+            <button class="btn btn-next" onclick="handleNextClick()">Дальше ➔</button>
+        </div>
+    </div>
+
+    <!-- 3. ЭКРАН ТЕСТА 1 (Счет до 120) -->
+    <div id="test1-screen" class="screen">
+        <div class="test-container">
+            <h2>Тест 1/3: Скорость счета</h2>
+            <p class="instruction">
+                Ваша задача — как можно быстрее сосчитать вслух от 1 до 120.<br><br>
+                Нажмите «Старт» и начните считать. Как только произнесете «120», сразу нажмите «Стоп».
+            </p>
+            <div id="test1-stopwatch" class="stopwatch">00:00.0</div>
+            <button id="btn-test1-start" class="btn btn-next" onclick="startTest1()">Старт</button>
+            <button id="btn-test1-stop" class="btn btn-stop" style="display: none;" onclick="stopTest1()">Стоп</button>
+            <button id="btn-test1-next" class="btn btn-next" style="display: none; margin-top: 20px;"
+                onclick="goToTest2()">Перейти ко 2 тесту ➔</button>
+        </div>
+    </div>
+
+    <!-- 4. ЭКРАН ТЕСТА 2 (Слова) -->
+    <div id="test2-screen" class="screen">
+        <div class="test-container" style="max-width: 95%;">
+            <h2>Тест 2/3: Память на слова</h2>
+            <p id="test2-instruction" class="instruction">
+                Вам будет дано 30 слов и 2 минуты, чтобы их запомнить. Постарайтесь запомнить как можно больше.
+            </p>
+            <div id="test2-timer" class="stopwatch">02:00</div>
+
+            <div id="test2-words-grid" class="words-grid" style="display: none;"></div>
+
+            <div id="test2-input-area" style="display: none; width: 100%;">
+                <textarea id="test2-textarea" rows="6"
+                    placeholder="Вводите слова через пробел или запятую..."></textarea>
+            </div>
+
+            <div id="test2-result" class="summary-card" style="display: none; text-align: left;"></div>
+
+            <button id="btn-test2-start" class="btn btn-next" onclick="startTest2Phase1()">Начать запоминание</button>
+            <button id="btn-test2-early" class="btn btn-next" style="display: none;"
+                onclick="startTest2Phase2()">Запомнил, к вводу ➔</button>
+            <button id="btn-test2-finish" class="btn btn-next" style="display: none;" onclick="finishTest2()">Готово
+                (Завершить)</button>
+            <button id="btn-test2-next" class="btn btn-next" style="display: none; margin-top: 20px;"
+                onclick="goToTest3()">Перейти к 3 тесту ➔</button>
+        </div>
+    </div>
+
+    <!-- 5. ЭКРАН ТЕСТА 3 (Струп) -->
+    <div id="test3-screen" class="screen">
+        <div class="test-container" style="max-width: 95%;">
+            <h2>Тест 3/3: Тест Струпа</h2>
+            <p class="instruction">
+                Называйте вслух <b>ЦВЕТ ШРИФТА</b>, которым написано слово, игнорируя само слово.<br><br>
+                Нажмите «Старт», назовите цвета всех 50 слов, затем нажмите «Стоп».
+            </p>
+
+            <div id="test3-stopwatch" class="stopwatch">00:00.0</div>
+
+            <div id="test3-grid" class="stroop-grid"></div>
+
+            <button id="btn-test3-start" class="btn btn-next" onclick="startTest3()">Старт</button>
+            <button id="btn-test3-stop" class="btn btn-stop" style="display: none;" onclick="stopTest3()">Стоп</button>
+            <button id="btn-test3-finish" class="btn btn-next" style="display: none; margin-top: 20px;"
+                onclick="generateGlobalSummary()">Завершить тесты и получить результаты</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: СПРАВКА -->
+    <div id="help-modal" class="modal">
+        <h2>Справка (Help)</h2>
+        <div class="help-content">
+            <p>В программе TTM используются техники тренировки ума, разработанные японским учёным Рюта Кавашимой и
+                опубликованные в его книгах.</p>
+            <h3>1. Краткое описание</h3>
+            <p>Цикл «тренировка + тесты + отдых» — это неделя.</p>
+            <p>Первые 5 дней пользователь выполняет 100 арифметических упражнений на скорость.</p>
+            <p>На 6-ой день предлагаются 3 теста:</p>
+            <ol>
+                <li>На скорость счета цифр от 1 до 120.</li>
+                <li>На запоминание 30 слов в течение 2 мин и написание всех запомненных слов в отдельное окно в течение
+                    2 минут.</li>
+                <li><b>Тест Струпа:</b> — это классическая психологическая методика, оценивающая избирательное внимание,
+                    скорость реакции и когнитивную гибкость. Испытуемому нужно называть цвет чернил, которым написано
+                    слово, при этом значение самого слова противоречит цвету (например, слово «зеленый» написано красным
+                    цветом), что вызывает задержку ответа из-за конфликта восприятия.</li>
+            </ol>
+            <h3>2. Ввод параметров сессии при запуске программы</h3>
+            <p>Первые 5 дней пользователь запускает программу, вводя в поле <i>«Введите номер (1-5 тренировка, 6
+                    тест)»</i> порядковый номер тренировки. Если сегодня первый день, нужно ввести 1, и т.д.</p>
+            <p>В 6-ой день цикла пользователь вводит в поле число <b>6</b>.</p>
+            <h3>3. Сохранение результатов</h3>
+            <p>По окончании тренировки и каждого теста соответствующие результаты можно скопировать в буфер обмена и
+                сохранить на своём компьютере или в телефоне.</p>
+        </div>
+        <button class="btn" onclick="closeHelp()" style="margin-top: 20px;">Закрыть</button>
+    </div>
+
+    <!-- ДРУГИЕ МОДАЛЬНЫЕ ОКНА -->
+    <div id="pause-modal" class="modal">
+        <h2>Пауза</h2>
+        <div id="pause-history"></div><button class="btn" onclick="resumeTraining()">Продолжить</button>
+    </div>
+    <div id="errors-modal" class="modal">
+        <h2>Разбор ошибок</h2>
+        <div id="errors-list"></div><button class="btn btn-next" onclick="showTrainingSummary()">Понятно, к
+            итогам</button>
+    </div>
+
+    <!-- ГЛОБАЛЬНЫЙ ЭКРАН ИТОГОВ (Для копирования) -->
+    <div id="global-summary-modal" class="modal">
+        <h2 id="summary-title">Результаты</h2>
+        <div class="summary-card">
+            <p>Скопируйте текст ниже и сохраните его для отслеживания прогресса.</p>
+            <textarea id="copy-text-area" class="copy-area" readonly></textarea>
+            <button id="btn-copy-results" class="btn btn-copy" onclick="copyResults()">📋 Скопировать
+                результаты</button>
+        </div>
+        <button id="btn-return-main" class="btn" onclick="location.reload()" style="margin-top: 20px;">Вернуться на
+            главную</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp || {};
+        const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Тестовый Пользователь" };
+        document.getElementById('ui-user-id').innerText = userData.id;
+        document.getElementById('ui-user-name').innerText = userData.first_name;
+
+        // Глобальные переменные для сбора результатов
+        let currentSessionType = "";
+        let currentModuleNumber = "";
+        let globalResults = {
+            date: new Date().toLocaleDateString('ru-RU'),
+            training: { time: "", errors: 0, score: 0 },
+            tests: { test1: "", test2Score: "", test2Percent: "", test3: "" }
+        };
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startModule() {
+            let val = parseInt(document.getElementById('module-input').value);
+            currentModuleNumber = val;
+            if (val >= 1 && val <= 5) {
+                currentSessionType = "training";
+                initTraining();
+            } else if (val === 6) {
+                currentSessionType = "tests";
+                switchScreen('test1-screen');
+            } else {
+                alert("Пожалуйста, введите число от 1 до 6.");
+            }
+        }
+        function openHelp() { document.getElementById('help-modal').classList.add('active'); }
+        function closeHelp() { document.getElementById('help-modal').classList.remove('active'); }
+
+        // ================== ТЕСТ 1 ==================
+        let test1StartTime = 0, test1Interval, test1ResultMs = 0;
+        function formatStopwatch(ms) {
+            let totalSeconds = Math.floor(ms / 1000);
+            let minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            let seconds = String(totalSeconds % 60).padStart(2, '0');
+            let tenths = Math.floor((ms % 1000) / 100);
+            return `${minutes}:${seconds}.${tenths}`;
+        }
+        function startTest1() {
+            document.getElementById('btn-test1-start').style.display = 'none';
+            document.getElementById('btn-test1-stop').style.display = 'block';
+            test1StartTime = Date.now();
+            test1Interval = setInterval(() => { document.getElementById('test1-stopwatch').innerText = formatStopwatch(Date.now() - test1StartTime); }, 100);
+        }
+        function stopTest1() {
+            clearInterval(test1Interval); test1ResultMs = Date.now() - test1StartTime;
+            let formattedTime = formatStopwatch(test1ResultMs);
+            document.getElementById('test1-stopwatch').innerText = formattedTime;
+            globalResults.tests.test1 = formattedTime;
+            document.getElementById('btn-test1-stop').style.display = 'none';
+            document.getElementById('btn-test1-next').style.display = 'block';
+        }
+        function goToTest2() { switchScreen('test2-screen'); }
+
+        // ================== ТЕСТ 2 (Слова) ==================
+        const fullDictionary = [
+            "абрикос", "авария", "автобус", "автомат", "адрес", "аист", "актер", "аллея", "альбом", "ананас", "ангел", "апельсин", "аптека", "арбуз", "армия", "артист", "архив", "бабочка", "бабушка", "багаж", "база", "балкон", "банан", "банка", "барабан", "баран", "башня", "бегемот", "беда", "бензин", "берег", "беседа", "библиотека", "билет", "битва", "блин", "блокнот", "болото", "больница", "ботинок", "брат", "бревно", "бровь", "брюки", "буква", "букет", "бумага", "бутылка", "бык", "вагон", "ваза", "ванна", "варенье", "ведро", "веник", "венок", "весна", "ветер", "ветка", "вечер", "вещь", "вилка", "виноград", "вишня", "вкус", "вода", "водитель", "волна", "волос", "волк", "вопрос", "воробей", "ворон", "ворота", "врач", "время", "вторник", "выбор", "выход", "газета", "гайка", "гараж", "гвоздь", "герой", "гитара", "глаз", "глина", "глобус", "гнездо", "голова", "голод", "голос", "голубь", "гора", "город", "горох", "гость", "граница", "гриб", "гроза", "гром", "грудь", "груз", "груша", "грязь", "губа", "гусь", "дверь", "двор", "дворец", "девочка", "девушка", "дед", "дедушка", "дело", "день", "деньги", "дерево", "деревня", "дети", "диван", "директор", "добыча", "дождь", "доктор", "документ", "долг", "долина", "дом", "дорога", "доска", "дочь", "друг", "дуб", "дух", "душа", "дым", "дыня", "дядя", "еда", "ежик", "елка", "жаба", "жажда", "жара", "железо", "жена", "женщина", "живот", "животное", "жизнь", "жир", "жук", "журнал", "забор", "завод", "завтрак", "загадка", "задача", "закон", "замок", "запад", "запах", "запас", "заряд", "звезда", "зверь", "звонок", "звук", "здание", "здоровье", "зебра", "земля", "зеркало", "зерно", "зима", "змея", "знак", "знание", "золото", "зонт", "зуб", "игла", "игра", "идея", "изба", "имя", "инженер", "интерес", "искусство", "искра", "история", "кабан", "кабинет", "камень", "камера", "канал", "канат", "капля", "капуста", "карандаш", "карман", "карта", "картина", "картошка", "касса", "кастрюля", "каша", "квартира", "кепка", "кино", "кисть", "класс", "клетка", "клиент", "клуб", "клубника", "ключ", "книга", "ковер", "кожа", "коза", "колесо", "кольцо", "команда", "комната", "компания", "конец", "конфета", "конь", "корабль", "корень", "корзина", "коробка", "корова", "корона", "коса", "кость", "костюм", "кот", "котел", "кофе", "кошка", "край", "кран", "краска", "кресло", "крест", "кровь", "кролик", "круг", "крыло", "крыса", "крыша", "крючок", "кубик", "кукла", "курица", "кусок", "куст", "кухня", "лагерь", "лампа", "лапа", "ласточка", "лебедь", "лев", "лед", "лекарство", "лес", "лестница", "лето", "летчик", "лимон", "линия", "лиса", "лист", "лицо", "лоб", "лодка", "ложка", "лошадь", "луг", "лук", "луна", "луч", "лыжи", "любовь", "люди", "лягушка", "магазин", "магнитофон", "мазь", "мальчик", "мама", "марка", "масло", "мастер", "машина", "мебель", "мед", "медведь", "медь", "мел", "место", "месяц", "металл", "меч", "мечта", "мешок", "миг", "минута", "мир", "миска", "мозг", "молоко", "молоток", "море", "мороз", "моряк", "мост", "мотор", "мотоцикл", "мужик", "мужчина", "музей", "музыка", "мука", "муравей", "мусор", "муха", "мысль", "мышь", "мясо", "мяч", "награда", "надежда", "народ", "наряд", "насос", "наука", "начало", "небо", "неделя", "нитка", "новость", "нога", "нож", "ножницы", "номер", "нос", "носок", "ночь", "обезьяна", "облако", "обида", "обман", "образ", "обувь", "овощи", "овца", "огонь", "огород", "огурец", "одежда", "одеяло", "озеро", "океан", "окно", "олень", "орел", "орех", "оружие", "осень", "остров", "отец", "отдых", "ответ", "отель", "охота", "ошибка", "палец", "пальто", "память", "папа", "пар", "парк", "парень", "пароход", "паспорт", "пассажир", "пастух", "паук", "паутина", "пекарь", "пена", "пень", "перо", "песня", "песок", "петух", "печать", "печь", "пила", "пилот", "писатель", "письмо", "пища", "пламя", "план", "планета", "платье", "плащ", "плечо", "плита", "плод", "плот", "площадь", "победа", "повар", "погода", "подарок", "подвал", "подруга", "поезд", "пожар", "поиск", "покой", "поле", "полет", "политика", "полка", "полотенце", "польза", "помидор", "помощь", "попугай", "порошок", "порт", "порядок", "посуда", "потолок", "почта", "поэт", "правда", "правило", "праздник", "предмет", "привычка", "приказ", "пример", "природа", "причина", "проблема", "провод", "программа", "прогулка", "продукт", "проект", "профессия", "процесс", "птица", "пуля", "пункт", "путь", "пчела", "пшеница", "пыль", "пятно", "работа", "рабочий", "радость", "радио", "радуга", "разговор", "размер", "район", "ракета", "рама", "рана", "растение", "ребенок", "ребята", "революция", "регион", "результат", "река", "реклама", "ремонт", "ресторан", "рецепт", "речь", "решение", "рис", "рисунок", "рог", "родина", "родители", "родник", "роза", "роль", "роман", "рост", "рот", "рубашка", "рубль", "рука", "рукав", "ручка", "рыба", "рыбак", "рынок", "рюкзак", "ряд", "сабля", "сад", "салат", "сало", "самовар", "самолет", "сапог", "сарай", "сахар", "свадьба", "свет", "свинья", "свобода", "связь", "север", "секрет", "секунда", "село", "семья", "сено", "сердце", "серебро", "сестра", "сеть", "сигарета", "сила", "система", "ситуация", "сказка", "скала", "скамейка", "скорость", "скрипка", "след", "слеза", "слово", "слон", "служба", "слух", "случай", "смех", "смысл", "снег", "собака", "событие", "совет", "сок", "солдат", "солнце", "соловей", "соль", "сон", "сосед", "сосна", "состояние", "сотрудник", "союз", "спина", "спичка", "спорт", "способ", "среда", "стакан", "сталь", "станок", "старик", "старуха", "статья", "стекло", "стена", "степь", "стих", "стол", "столица", "столб", "сторона", "страна", "страх", "стрела", "строитель", "стройка", "студент", "стул", "ступень", "суббота", "суд", "судьба", "сумка", "суп", "сцена", "счастье", "сын", "сыр", "таблица", "тайна", "такси", "талант", "танец", "танк", "тарелка", "театр", "текст", "телевизор", "телефон", "тело", "тема", "темнота", "тень", "теория", "тепло", "территория", "тетрадь", "тетя", "техника", "тигр", "ткань", "товар", "товарищ", "толпа", "тонна", "топор", "точка", "трава", "трактор", "трамвай", "транспорт", "труд", "труба", "туман", "турист", "туфля", "туча", "тыква", "тьма", "тяжесть", "угол", "уголь", "угроза", "удар", "удача", "удовольствие", "ужас", "ужин", "узел", "узор", "улица", "улыбка", "ум", "университет", "управление", "уровень", "урок", "условие", "успех", "установка", "утро", "ухо", "участок", "учебник", "ученик", "ученый", "учитель", "фабрика", "факт", "фамилия", "фантазия", "ферма", "фигура", "физика", "фильм", "фирма", "флаг", "флот", "фон", "фонарь", "форма", "фотография", "фраза", "фрукт", "футбол", "хвост", "химия", "хлеб", "хлопок", "ход", "хозяин", "хозяйство", "холод", "холм", "храм", "художник", "царь", "цветок", "цель", "цена", "центр", "цепь", "церковь", "цифра", "чай", "чайник", "час", "частота", "часть", "часы", "чашка", "человек", "чемодан", "чемпион", "черепаха", "черта", "честь", "четверг", "число", "чистота", "читатель", "член", "чувство", "чудо", "шаг", "шапка", "шар", "шарф", "шахматы", "шесть", "шея", "ширина", "шкаф", "школа", "шкура", "шляпа", "шоколад", "шофер", "шпион", "штора", "штука", "шуба", "шум", "шутка", "щека", "щенок", "щит", "экзамен", "экран", "экскурсия", "электричество", "элемент", "энергия", "эпоха", "этаж", "этап", "юбка", "юг", "юноша", "яблоко", "ягода", "яд", "ядро", "язык", "яйцо", "яма", "январь", "ящерица", "ящик"
+        ];
+        let test2TargetWords = [], test2Interval, test2TimeLeft = 120;
+
+        function updateTest2Timer() {
+            let m = String(Math.floor(test2TimeLeft / 60)).padStart(2, '0');
+            let s = String(test2TimeLeft % 60).padStart(2, '0');
+            document.getElementById('test2-timer').innerText = `${m}:${s}`;
+        }
+
+        function startTest2Phase1() {
+            let shuffled = shuffleArray([...fullDictionary]);
+            test2TargetWords = shuffled.slice(0, 30);
+            const grid = document.getElementById('test2-words-grid');
+            grid.innerHTML = test2TargetWords.map(word => `<div class="word-item">${word}</div>`).join('');
+
+            document.getElementById('test2-instruction').innerText = "Запоминайте слова. У вас 2 минуты.";
+            document.getElementById('btn-test2-start').style.display = 'none';
+            grid.style.display = 'grid';
+            document.getElementById('btn-test2-early').style.display = 'block';
+
+            test2TimeLeft = 120; updateTest2Timer();
+            test2Interval = setInterval(() => {
+                test2TimeLeft--; updateTest2Timer();
+                if (test2TimeLeft <= 0) { clearInterval(test2Interval); startTest2Phase2(); }
+            }, 1000);
+        }
+
+        function startTest2Phase2() {
+            clearInterval(test2Interval);
+            document.getElementById('test2-words-grid').style.display = 'none';
+            document.getElementById('btn-test2-early').style.display = 'none';
+            document.getElementById('test2-instruction').innerText = "Введите все слова, которые удалось запомнить (порядок не важен).";
+            document.getElementById('test2-input-area').style.display = 'block';
+            document.getElementById('btn-test2-finish').style.display = 'block';
+            document.getElementById('test2-textarea').focus();
+
+            test2TimeLeft = 120; updateTest2Timer();
+            test2Interval = setInterval(() => {
+                test2TimeLeft--; updateTest2Timer();
+                if (test2TimeLeft <= 0) { clearInterval(test2Interval); finishTest2(); }
+            }, 1000);
+        }
+
+        function finishTest2() {
+            clearInterval(test2Interval);
+            document.getElementById('test2-input-area').style.display = 'none';
+            document.getElementById('btn-test2-finish').style.display = 'none';
+            document.getElementById('test2-instruction').style.display = 'none';
+            document.getElementById('test2-timer').style.display = 'none';
+
+            const userText = document.getElementById('test2-textarea').value.toLowerCase();
+            const userWords = userText.match(/[а-яё]+/g) || [];
+            const uniqueUserWords = [...new Set(userWords)];
+
+            let matchedWords = [];
+            uniqueUserWords.forEach(word => { if (test2TargetWords.includes(word)) matchedWords.push(word); });
+
+            let percent = Math.round((matchedWords.length / 30) * 100);
+
+            globalResults.tests.test2Score = `${matchedWords.length}/30`;
+            globalResults.tests.test2Percent = `${percent}%`;
+
+            const resultBox = document.getElementById('test2-result');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <h3 style="margin-top:0; color:#3390ec;">Результат: ${matchedWords.length} из 30</h3>
+                <p><b>Запомнено:</b> ${percent}%</p>
+                <p><b>Ваши правильные слова:</b> ${matchedWords.length > 0 ? matchedWords.join(', ') : 'Нет совпадений'}</p>
+            `;
+            document.getElementById('btn-test2-next').style.display = 'block';
+        }
+
+        function goToTest3() { switchScreen('test3-screen'); }
+
+        // ================== ТЕСТ 3 (Струп) ==================
+        let test3StartTime = 0, test3Interval, test3ResultMs = 0;
+
+        const stroopData = [
+            { name: "СИНИЙ", color: "#3390ec" },
+            { name: "ЖЁЛТЫЙ", color: "#d1a300" },
+            { name: "КРАСНЫЙ", color: "#ff3b30" },
+            { name: "ЗЕЛЁНЫЙ", color: "#34c759" }
+        ];
+
+        function startTest3() {
+            document.getElementById('btn-test3-start').style.display = 'none';
+            document.getElementById('btn-test3-stop').style.display = 'block';
+
+            const grid = document.getElementById('test3-grid');
+            let wordsHTML = "";
+            let prevText = "";
+            let prevColor = "";
+
+            for (let i = 0; i < 50; i++) {
+                let textItem, colorItem;
+
+                do {
+                    textItem = stroopData[Math.floor(Math.random() * stroopData.length)];
+                } while (textItem.name === prevText);
+
+                do {
+                    colorItem = stroopData[Math.floor(Math.random() * stroopData.length)];
+                } while (colorItem.name === textItem.name || colorItem.name === prevColor);
+
+                prevText = textItem.name;
+                prevColor = colorItem.name;
+
+                wordsHTML += `<div class="stroop-word" style="color: ${colorItem.color};">${textItem.name}</div>`;
+            }
+
+            grid.innerHTML = wordsHTML;
+            grid.style.display = 'flex';
+
+            test3StartTime = Date.now();
+            test3Interval = setInterval(() => { document.getElementById('test3-stopwatch').innerText = formatStopwatch(Date.now() - test3StartTime); }, 100);
+        }
+
+        function stopTest3() {
+            clearInterval(test3Interval);
+            test3ResultMs = Date.now() - test3StartTime;
+            let formattedTime = formatStopwatch(test3ResultMs);
+            document.getElementById('test3-stopwatch').innerText = formattedTime;
+            globalResults.tests.test3 = formattedTime;
+
+            document.getElementById('test3-grid').style.display = 'none';
+            document.getElementById('btn-test3-stop').style.display = 'none';
+            document.getElementById('btn-test3-finish').style.display = 'block';
+        }
+
+        // ================== ЛОГИКА ТРЕНИРОВКИ ==================
+        let tasks = [], currentIndex = 0, errorsCount = 0, history = [], timerInterval, secondsElapsed = 0, isPaused = false;
+        const inputX = document.getElementById('input-x'), inputY = document.getElementById('input-y'), remainderGroup = document.getElementById('remainder-group');
+
+        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function generateTasks() {
+            let allTasks = [], addPool = [], mulPool = [], subPool = [], divPool = [];
+            for (let a = 2; a <= 9; a++) for (let b = a + 1; b <= 9; b++) addPool.push({ op: '+', a: a, b: b, ansX: a + b, ansY: 0 });
+            for (let a = 2; a <= 9; a++) for (let b = a + 1; b <= 9; b++) mulPool.push({ op: '*', a: a, b: b, ansX: a * b, ansY: 0 });
+            for (let a = 2; a <= 19; a++) for (let b = 2; b <= 9; b++) if (a > b) subPool.push({ op: '-', a: a, b: b, ansX: a - b, ansY: 0 });
+            for (let b = 2; b <= 9; b++) {
+                for (let q = 2; q <= 9; q++) {
+                    let a_no = b * q; if (a_no >= 2 && a_no <= 19 && a_no !== b) divPool.push({ op: '/', a: a_no, b: b, ansX: q, ansY: 0 });
+                    for (let r = 2; r < b; r++) { let a_rem = b * q + r; if (a_rem >= 2 && a_rem <= 19 && a_rem !== b) divPool.push({ op: '/', a: a_rem, b: b, ansX: q, ansY: r }); }
+                }
+            }
+            return shuffleArray([].concat(shuffleArray(addPool).slice(0, 25), shuffleArray(mulPool).slice(0, 25), shuffleArray(subPool).slice(0, 25), shuffleArray(divPool).slice(0, 25)));
+        }
+
+        function initTraining() {
+            switchScreen('training-screen'); tasks = generateTasks();
+            inputX.addEventListener('input', function () { this.value = this.value.replace(/[^0-9]/g, ''); });
+            inputY.addEventListener('input', function () { this.value = this.value.replace(/[^0-9]/g, ''); });
+            startTimer(); showTask();
+        }
+        function startTimer() { timerInterval = setInterval(() => { if (!isPaused) { secondsElapsed++; let m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0'), s = String(secondsElapsed % 60).padStart(2, '0'); document.getElementById('timer').innerText = `Время: ${m}:${s}`; } }, 1000); }
+        function showTask() {
+            if (currentIndex >= tasks.length) { endTraining(); return; }
+            let task = tasks[currentIndex];
+            document.getElementById('equation').innerText = `${task.a} ${task.op} ${task.b} =`;
+            document.getElementById('progress').innerText = `Упражнение: ${currentIndex + 1}/100`;
+            inputX.value = ''; inputY.value = '';
+            if (task.op === '/') remainderGroup.classList.add('active'); else remainderGroup.classList.remove('active');
+            inputX.focus();
+        }
+        function handleNextClick() { if (!isPaused) checkAnswer(); }
+        function checkAnswer() {
+            let task = tasks[currentIndex], valX = parseInt(inputX.value) || 0, valY = parseInt(inputY.value) || 0, isCorrect = (valX === task.ansX && valY === task.ansY);
+            if (!isCorrect) { errorsCount++; document.getElementById('error-count').innerText = `Ошибок: ${errorsCount}`; }
+            history.push({ task: task, userX: valX, userY: valY, isCorrect: isCorrect });
+            currentIndex++; showTask();
+        }
+        function pauseTraining() {
+            isPaused = true; document.getElementById('pause-modal').classList.add('active');
+            document.getElementById('pause-history').innerHTML = history.map(h => `<div class="history-item ${h.isCorrect ? 'correct-text' : 'error-text'}">${h.task.a} ${h.task.op} ${h.task.b} = ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ост ${h.userY}` : ''}</div>`).join('') || '<p>Пока нет решенных упражнений.</p>';
+        }
+        function resumeTraining() { isPaused = false; document.getElementById('pause-modal').classList.remove('active'); inputX.focus(); }
+
+        function endTraining() {
+            clearInterval(timerInterval);
+            globalResults.training.time = `${String(Math.floor(secondsElapsed / 60)).padStart(2, '0')}:${String(secondsElapsed % 60).padStart(2, '0')}`;
+            globalResults.training.errors = errorsCount;
+            globalResults.training.score = Math.max(0, 100 - (errorsCount * 2));
+
+            if (errorsCount > 0) {
+                document.getElementById('errors-list').innerHTML = history.filter(h => !h.isCorrect).map(h => `<div class="history-item"><b>${h.task.a} ${h.task.op} ${h.task.b}</b><br><span class="error-text">Ваш ответ: ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ост ${h.userY}` : ''}</span><br><span class="correct-text">Правильный: ${h.task.ansX}${h.task.op === '/' && h.task.ansY > 0 ? ` ост ${h.task.ansY}` : ''}</span><hr></div>`).join('');
+                document.getElementById('errors-modal').classList.add('active');
+            } else {
+                generateGlobalSummary();
+            }
+        }
+
+        function showTrainingSummary() {
+            document.getElementById('errors-modal').classList.remove('active');
+            generateGlobalSummary();
+        }
+
+        // ================== ГЛОБАЛЬНЫЙ ВЫВОД И КОПИРОВАНИЕ ==================
+        function generateGlobalSummary() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('global-summary-modal').classList.add('active');
+
+            let reportText = `Дата: ${globalResults.date}\n`;
+            reportText += `Имя: ${userData.first_name}\n`;
+            reportText += `ID: ${userData.id}\n`;
+            reportText += `Модуль: ${currentModuleNumber}\n`;
+            reportText += `-----------------------\n`;
+
+            if (currentSessionType === "training") {
+                document.getElementById('summary-title').innerText = "Тренировка завершена!";
+                reportText += `Время: ${globalResults.training.time}\n`;
+                reportText += `Ошибок: ${globalResults.training.errors}\n`;
+                reportText += `Оценка: ${globalResults.training.score}/100\n`;
+            } else if (currentSessionType === "tests") {
+                document.getElementById('summary-title').innerText = "Тесты завершены!";
+                reportText += `Тест 1 (Счет): ${globalResults.tests.test1}\n`;
+                reportText += `Тест 2 (Слова): ${globalResults.tests.test2Score} (${globalResults.tests.test2Percent})\n`;
+                reportText += `Тест 3 (Струп): ${globalResults.tests.test3}\n`;
+            }
+
+            document.getElementById('copy-text-area').value = reportText;
+
+            // Устанавливаем фокус на кнопку копирования с небольшой задержкой для отрисовки модального окна
+            setTimeout(() => {
+                document.getElementById('btn-copy-results').focus();
+            }, 100);
+        }
+
+        function copyResults() {
+            const copyText = document.getElementById('copy-text-area');
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("Результаты успешно скопированы в буфер обмена!");
+                document.getElementById('btn-return-main').focus(); // Фокус на кнопку "Вернуться на главную"
+            }).catch(err => {
+                alert("Не удалось скопировать. Пожалуйста, выделите текст и скопируйте вручную.");
+                document.getElementById('btn-return-main').focus();
+            });
+        }
+
+        // ================== ГЛОБАЛЬНЫЙ ОБРАБОТЧИК КЛАВИШИ ENTER ==================
+        window.onload = function () {
+            document.getElementById('module-input').focus();
+        };
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                if (document.activeElement.tagName === 'BUTTON' || document.activeElement.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                const activeScreen = document.querySelector('.screen.active');
+                if (!activeScreen) return;
+
+                if (activeScreen.id === 'training-screen') {
+                    e.preventDefault();
+                    let task = tasks[currentIndex];
+                    if (task.op === '/') {
+                        if (document.activeElement === inputX) inputY.focus();
+                        else if (document.activeElement === inputY) checkAnswer();
+                    } else {
+                        checkAnswer();
+                    }
+                    return;
+                }
+
+                if (activeScreen.id === 'start-screen') {
+                    e.preventDefault();
+                    startModule();
+                    return;
+                }
+
+                const primaryBtn = Array.from(activeScreen.querySelectorAll('.btn-next, .btn-stop')).find(btn => window.getComputedStyle(btn).display !== 'none');
+
+                if (primaryBtn) {
+                    e.preventDefault();
+                    primaryBtn.click();
+                }
+            }
+
+            if (e.key === 'Tab' && document.querySelector('.screen.active')?.id === 'training-screen') {
+                if (e.shiftKey && document.activeElement === inputY) {
+                    e.preventDefault();
+                    inputX.focus();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
