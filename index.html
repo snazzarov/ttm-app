@@ -35,7 +35,6 @@
             box-shadow: 0 0 0 3px rgba(51, 144, 236, 0.5);
         }
 
-        /* Визуальное выделение фокуса */
         .btn:active {
             background-color: #2b7bb9;
         }
@@ -106,21 +105,38 @@
             display: flex;
         }
 
-        /* Глобальная кнопка Help */
-        .help-btn {
+        /* Глобальные кнопки (Справка и Язык) */
+        .top-btns {
             position: fixed;
             top: 15px;
-            right: 15px;
+            width: calc(100% - 30px);
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .top-btn {
+            pointer-events: auto;
             background-color: #e0e0e0;
             color: #333;
             border: none;
-            width: 35px;
             height: 35px;
-            border-radius: 50%;
+            border-radius: 17.5px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            z-index: 100;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .help-btn {
+            width: 35px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 18px;
         }
 
         /* Стартовый экран */
@@ -242,7 +258,7 @@
             margin-bottom: 20px;
         }
 
-        /* Сетка для слов (Тест 2) */
+        /* Сетки для слов */
         .words-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -260,7 +276,6 @@
             border-bottom: 1px solid #eee;
         }
 
-        /* Сетка Струпа (Тест 3) */
         .stroop-grid {
             display: none;
             flex-wrap: wrap;
@@ -369,22 +384,26 @@
 
 <body>
 
-    <button class="help-btn" onclick="openHelp()">?</button>
+    <div class="top-btns">
+        <button id="lang-toggle-btn" class="top-btn" onclick="toggleLang()">RU</button>
+        <button class="top-btn help-btn" onclick="openHelp()">?</button>
+    </div>
 
     <!-- 1. СТАРТОВЫЙ ЭКРАН -->
     <div id="start-screen" class="screen active">
         <div class="start-container">
             <h1>TTM</h1>
-            <p>Train and Tests Mind</p>
+            <p data-i18n="appDesc">Train and Tests Mind</p>
             <div class="user-info">
-                <div><b>ID:</b> <span id="ui-user-id">Загрузка...</span></div>
-                <div><b>Имя:</b> <span id="ui-user-name">Загрузка...</span></div>
+                <div><b>ID:</b> <span id="ui-user-id">...</span></div>
+                <div><b data-i18n="nameLabel">Имя:</b> <span id="ui-user-name">...</span></div>
             </div>
             <div class="input-group">
-                <label for="module-input">Введите номер (1-5 тренировка, 6 тест):</label>
-                <input type="number" id="module-input" min="1" max="6" placeholder="Например: 1">
+                <label for="module-input" data-i18n="inputLabel">Введите номер (1-5 тренировка, 6 тест):</label>
+                <input type="number" id="module-input" min="1" max="6" data-i18n-ph="inputPlaceholder"
+                    placeholder="Например: 1">
             </div>
-            <button class="btn btn-next" onclick="startModule()">Запустить</button>
+            <button class="btn btn-next" onclick="startModule()" data-i18n="btnStart">Запустить</button>
         </div>
     </div>
 
@@ -396,92 +415,91 @@
                 <span id="error-count">Ошибок: 0</span>
                 <span id="progress">Упражнение: 1/100</span>
             </div>
-            <button class="btn btn-small" onclick="pauseTraining()">Пауза</button>
+            <button class="btn btn-small" onclick="pauseTraining()" data-i18n="btnPause">Пауза</button>
         </div>
         <div class="workspace">
             <div class="exercise">
                 <span id="equation">A + B =</span>
                 <input type="text" id="input-x" class="math-input" inputmode="numeric" autocomplete="off">
                 <div class="remainder-group" id="remainder-group">
-                    <span>ост</span>
+                    <span data-i18n="remLabel">ост</span>
                     <input type="text" id="input-y" class="math-input" inputmode="numeric" autocomplete="off"
                         placeholder="0">
                 </div>
             </div>
-            <button class="btn btn-next" onclick="handleNextClick()">Дальше ➔</button>
+            <button class="btn btn-next" onclick="handleNextClick()" data-i18n="btnNext">Дальше ➔</button>
         </div>
     </div>
 
     <!-- 3. ЭКРАН ТЕСТА 1 (Счет до 120) -->
     <div id="test1-screen" class="screen">
         <div class="test-container">
-            <h2>Тест 1/3: Скорость счета</h2>
-            <p class="instruction">
-                Ваша задача — как можно быстрее сосчитать вслух от 1 до 120.<br><br>
-                Нажмите «Старт» и начните считать. Как только произнесете «120», сразу нажмите «Стоп».
-            </p>
+            <h2 data-i18n="t1Title">Тест 1/3: Скорость счета</h2>
+            <p class="instruction" data-i18n="t1Inst">Ваша задача — как можно быстрее сосчитать вслух от 1 до
+                120.<br><br>Нажмите «Старт» и начните считать. Как только произнесете «120», сразу нажмите «Стоп».</p>
             <div id="test1-stopwatch" class="stopwatch">00:00.0</div>
-            <button id="btn-test1-start" class="btn btn-next" onclick="startTest1()">Старт</button>
-            <button id="btn-test1-stop" class="btn btn-stop" style="display: none;" onclick="stopTest1()">Стоп</button>
+            <button id="btn-test1-start" class="btn btn-next" onclick="startTest1()"
+                data-i18n="btnStartTest">Старт</button>
+            <button id="btn-test1-stop" class="btn btn-stop" style="display: none;" onclick="stopTest1()"
+                data-i18n="btnStopTest">Стоп</button>
             <button id="btn-test1-next" class="btn btn-next" style="display: none; margin-top: 20px;"
-                onclick="goToTest2()">Перейти ко 2 тесту ➔</button>
+                onclick="goToTest2()" data-i18n="btnGoTest2">Перейти ко 2 тесту ➔</button>
         </div>
     </div>
 
     <!-- 4. ЭКРАН ТЕСТА 2 (Слова) -->
     <div id="test2-screen" class="screen">
         <div class="test-container" style="max-width: 95%;">
-            <h2>Тест 2/3: Память на слова</h2>
-            <p id="test2-instruction" class="instruction">
-                Вам будет дано 30 слов и 2 минуты, чтобы их запомнить. Постарайтесь запомнить как можно больше.
-            </p>
+            <h2 data-i18n="t2Title">Тест 2/3: Память на слова</h2>
+            <p id="test2-instruction" class="instruction" data-i18n="t2Inst1">Вам будет дано 30 слов и 2 минуты, чтобы
+                их запомнить. Постарайтесь запомнить как можно больше.</p>
             <div id="test2-timer" class="stopwatch">02:00</div>
 
             <div id="test2-words-grid" class="words-grid" style="display: none;"></div>
 
             <div id="test2-input-area" style="display: none; width: 100%;">
-                <textarea id="test2-textarea" rows="6"
+                <textarea id="test2-textarea" rows="6" data-i18n-ph="t2Placeholder"
                     placeholder="Вводите слова через пробел или запятую..."></textarea>
             </div>
 
             <div id="test2-result" class="summary-card" style="display: none; text-align: left;"></div>
 
-            <button id="btn-test2-start" class="btn btn-next" onclick="startTest2Phase1()">Начать запоминание</button>
-            <button id="btn-test2-early" class="btn btn-next" style="display: none;"
-                onclick="startTest2Phase2()">Запомнил, к вводу ➔</button>
-            <button id="btn-test2-finish" class="btn btn-next" style="display: none;" onclick="finishTest2()">Готово
-                (Завершить)</button>
+            <button id="btn-test2-start" class="btn btn-next" onclick="startTest2Phase1()"
+                data-i18n="btnStartMem">Начать запоминание</button>
+            <button id="btn-test2-early" class="btn btn-next" style="display: none;" onclick="startTest2Phase2()"
+                data-i18n="btnGoInput">Запомнил, к вводу ➔</button>
+            <button id="btn-test2-finish" class="btn btn-next" style="display: none;" onclick="finishTest2()"
+                data-i18n="btnFinishTest">Готово (Завершить)</button>
             <button id="btn-test2-next" class="btn btn-next" style="display: none; margin-top: 20px;"
-                onclick="goToTest3()">Перейти к 3 тесту ➔</button>
+                onclick="goToTest3()" data-i18n="btnGoTest3">Перейти к 3 тесту ➔</button>
         </div>
     </div>
 
     <!-- 5. ЭКРАН ТЕСТА 3 (Струп) -->
     <div id="test3-screen" class="screen">
         <div class="test-container" style="max-width: 95%;">
-            <h2>Тест 3/3: Тест Струпа</h2>
-            <p class="instruction">
-                Называйте вслух <b>ЦВЕТ ШРИФТА</b>, которым написано слово, игнорируя само слово.<br><br>
-                Нажмите «Старт», назовите цвета всех 50 слов, затем нажмите «Стоп».
-            </p>
+            <h2 data-i18n="t3Title">Тест 3/3: Тест Струпа</h2>
+            <p class="instruction" data-i18n="t3Inst">Называйте вслух <b>ЦВЕТ ШРИФТА</b>, которым написано слово,
+                игнорируя само слово.<br><br>Нажмите «Старт», назовите цвета всех 50 слов, затем нажмите «Стоп».</p>
 
             <div id="test3-stopwatch" class="stopwatch">00:00.0</div>
-
             <div id="test3-grid" class="stroop-grid"></div>
 
-            <button id="btn-test3-start" class="btn btn-next" onclick="startTest3()">Старт</button>
-            <button id="btn-test3-stop" class="btn btn-stop" style="display: none;" onclick="stopTest3()">Стоп</button>
+            <button id="btn-test3-start" class="btn btn-next" onclick="startTest3()"
+                data-i18n="btnStartTest">Старт</button>
+            <button id="btn-test3-stop" class="btn btn-stop" style="display: none;" onclick="stopTest3()"
+                data-i18n="btnStopTest">Стоп</button>
             <button id="btn-test3-finish" class="btn btn-next" style="display: none; margin-top: 20px;"
-                onclick="generateGlobalSummary()">Завершить тесты и получить результаты</button>
+                onclick="generateGlobalSummary()" data-i18n="btnFinishAll">Завершить тесты и получить
+                результаты</button>
         </div>
     </div>
 
     <!-- МОДАЛЬНОЕ ОКНО: СПРАВКА -->
     <div id="help-modal" class="modal">
-        <h2>Справка (Help)</h2>
-        <div class="help-content">
-            <p>В программе TTM используются техники тренировки ума, разработанные японским учёным Рюта Кавашимой и
-                опубликованные в его книгах.</p>
+        <h2 data-i18n="helpTitle">Справка (Help)</h2>
+        <div class="help-content" id="help-content-ru">
+            <p>В программе TTM используются техники тренировки ума, разработанные японским учёным Рюта Кавашимой.</p>
             <h3>1. Краткое описание</h3>
             <p>Цикл «тренировка + тесты + отдых» — это неделя.</p>
             <p>Первые 5 дней пользователь выполняет 100 арифметических упражнений на скорость.</p>
@@ -490,60 +508,146 @@
                 <li>На скорость счета цифр от 1 до 120.</li>
                 <li>На запоминание 30 слов в течение 2 мин и написание всех запомненных слов в отдельное окно в течение
                     2 минут.</li>
-                <li><b>Тест Струпа:</b> — это классическая психологическая методика, оценивающая избирательное внимание,
-                    скорость реакции и когнитивную гибкость. Испытуемому нужно называть цвет чернил, которым написано
-                    слово, при этом значение самого слова противоречит цвету (например, слово «зеленый» написано красным
-                    цветом), что вызывает задержку ответа из-за конфликта восприятия.</li>
+                <li><b>Тест Струпа:</b> Нужно называть цвет чернил, которым написано слово, при этом значение самого
+                    слова противоречит цвету.</li>
             </ol>
-            <h3>2. Ввод параметров сессии при запуске программы</h3>
-            <p>Первые 5 дней пользователь запускает программу, вводя в поле <i>«Введите номер (1-5 тренировка, 6
-                    тест)»</i> порядковый номер тренировки. Если сегодня первый день, нужно ввести 1, и т.д.</p>
-            <p>В 6-ой день цикла пользователь вводит в поле число <b>6</b>.</p>
+            <h3>2. Ввод параметров сессии</h3>
+            <p>Первые 5 дней вводите номер тренировки (от 1 до 5). В 6-ой день введите число <b>6</b> для запуска
+                тестов.</p>
             <h3>3. Сохранение результатов</h3>
-            <p>По окончании тренировки и каждого теста соответствующие результаты можно скопировать в буфер обмена и
-                сохранить на своём компьютере или в телефоне.</p>
+            <p>По окончании результаты можно скопировать в буфер обмена.</p>
         </div>
-        <button class="btn" onclick="closeHelp()" style="margin-top: 20px;">Закрыть</button>
+        <div class="help-content" id="help-content-en" style="display: none;">
+            <p>The TTM program uses mind training techniques developed by Japanese scientist Ryuta Kawashima.</p>
+            <h3>1. Brief Description</h3>
+            <p>A cycle of "training + tests + rest" equals one week.</p>
+            <p>For the first 5 days, the user performs 100 speed arithmetic exercises.</p>
+            <p>On the 6th day, 3 tests are offered:</p>
+            <ol>
+                <li>Speed counting from 1 to 120.</li>
+                <li>Memorizing 30 words for 2 minutes and typing them in a separate window within 2 minutes.</li>
+                <li><b>Stroop Test:</b> Name the ink color of the word, ignoring the word's meaning.</li>
+            </ol>
+            <h3>2. Session Parameters</h3>
+            <p>For the first 5 days, enter the training number (1 to 5). On the 6th day, enter <b>6</b> to start the
+                tests.</p>
+            <h3>3. Saving Results</h3>
+            <p>Upon completion, results can be copied to the clipboard.</p>
+        </div>
+        <button class="btn" onclick="closeHelp()" style="margin-top: 20px;" data-i18n="btnClose">Закрыть</button>
     </div>
 
-    <!-- ДРУГИЕ МОДАЛЬНЫЕ ОКНА -->
+    <!-- МОДАЛЬНОЕ ОКНО: ПАУЗА -->
     <div id="pause-modal" class="modal">
-        <h2>Пауза</h2>
-        <div id="pause-history"></div><button class="btn" onclick="resumeTraining()">Продолжить</button>
+        <h2 data-i18n="pauseTitle">Пауза</h2>
+        <div id="pause-history"></div>
+        <button class="btn" onclick="resumeTraining()" data-i18n="btnResume">Продолжить</button>
     </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ОШИБКИ -->
     <div id="errors-modal" class="modal">
-        <h2>Разбор ошибок</h2>
-        <div id="errors-list"></div><button class="btn btn-next" onclick="showTrainingSummary()">Понятно, к
+        <h2 data-i18n="errTitle">Разбор ошибок</h2>
+        <div id="errors-list"></div>
+        <button class="btn btn-next" onclick="showTrainingSummary()" data-i18n="btnUnderstand">Понятно, к
             итогам</button>
     </div>
 
-    <!-- ГЛОБАЛЬНЫЙ ЭКРАН ИТОГОВ (Для копирования) -->
+    <!-- ГЛОБАЛЬНЫЙ ЭКРАН ИТОГОВ -->
     <div id="global-summary-modal" class="modal">
-        <h2 id="summary-title">Результаты</h2>
+        <h2 id="summary-title" data-i18n="sumTitle">Результаты</h2>
         <div class="summary-card">
-            <p>Скопируйте текст ниже и сохраните его для отслеживания прогресса.</p>
+            <p data-i18n="sumInst">Скопируйте текст ниже и сохраните его для отслеживания прогресса.</p>
             <textarea id="copy-text-area" class="copy-area" readonly></textarea>
-            <button id="btn-copy-results" class="btn btn-copy" onclick="copyResults()">📋 Скопировать
-                результаты</button>
+            <button id="btn-copy-results" class="btn btn-copy" onclick="copyResults()" data-i18n="btnCopy">📋
+                Скопировать результаты</button>
         </div>
-        <button id="btn-return-main" class="btn" onclick="location.reload()" style="margin-top: 20px;">Вернуться на
-            главную</button>
+        <button id="btn-return-main" class="btn" onclick="location.reload()" style="margin-top: 20px;"
+            data-i18n="btnReturn">Вернуться на главную</button>
     </div>
 
     <script>
+        // ================== ЛОКАЛИЗАЦИЯ (i18n) ==================
+        let currentLang = 'ru';
+
+        const translations = {
+            ru: {
+                appDesc: "Train and Tests Mind", nameLabel: "Имя:", inputLabel: "Введите номер (1-5 тренировка, 6 тест):",
+                inputPlaceholder: "Например: 1", btnStart: "Запустить", btnPause: "Пауза", remLabel: "ост", btnNext: "Дальше ➔",
+                t1Title: "Тест 1/3: Скорость счета", t1Inst: "Ваша задача — как можно быстрее сосчитать вслух от 1 до 120.<br><br>Нажмите «Старт» и начните считать. Как только произнесете «120», сразу нажмите «Стоп».",
+                btnStartTest: "Старт", btnStopTest: "Стоп", btnGoTest2: "Перейти ко 2 тесту ➔",
+                t2Title: "Тест 2/3: Память на слова", t2Inst1: "Вам будет дано 30 слов и 2 минуты, чтобы их запомнить. Постарайтесь запомнить как можно больше.",
+                t2Inst2: "Запоминайте слова. У вас 2 минуты.", t2Inst3: "Введите все слова, которые удалось запомнить (порядок не важен).",
+                t2Placeholder: "Вводите слова через пробел или запятую...", btnStartMem: "Начать запоминание", btnGoInput: "Запомнил, к вводу ➔",
+                btnFinishTest: "Готово (Завершить)", btnGoTest3: "Перейти к 3 тесту ➔",
+                t3Title: "Тест 3/3: Тест Струпа", t3Inst: "Называйте вслух <b>ЦВЕТ ШРИФТА</b>, которым написано слово, игнорируя само слово.<br><br>Нажмите «Старт», назовите цвета всех 50 слов, затем нажмите «Стоп».",
+                btnFinishAll: "Завершить тесты и получить результаты", helpTitle: "Справка (Help)", btnClose: "Закрыть",
+                pauseTitle: "Пауза", btnResume: "Продолжить", errTitle: "Разбор ошибок", btnUnderstand: "Понятно, к итогам",
+                sumTitle: "Результаты", sumInst: "Скопируйте текст ниже и сохраните его для отслеживания прогресса.", btnCopy: "📋 Скопировать результаты", btnReturn: "Вернуться на главную",
+                jsTime: "Время", jsErrors: "Ошибок", jsExercise: "Упражнение", jsNoHistory: "Пока нет решенных упражнений.",
+                jsYourAns: "Ваш ответ", jsCorrectAns: "Правильный", jsAlertInput: "Пожалуйста, введите число от 1 до 6.",
+                jsAlertCopyOk: "Результаты успешно скопированы в буфер обмена!", jsAlertCopyErr: "Не удалось скопировать. Пожалуйста, выделите текст и скопируйте вручную.",
+                jsT2Res: "Результат", jsT2Mem: "Запомнено", jsT2Correct: "Ваши правильные слова", jsT2None: "Нет совпадений",
+                jsSumTrainDone: "Тренировка завершена!", jsSumTestDone: "Тесты завершены!", jsSumDate: "Дата", jsSumName: "Имя", jsSumMod: "Модуль", jsSumScore: "Оценка",
+                jsT1Name: "Тест 1 (Счет)", jsT2Name: "Тест 2 (Слова)", jsT3Name: "Тест 3 (Струп)"
+            },
+            en: {
+                appDesc: "Train and Tests Mind", nameLabel: "Name:", inputLabel: "Enter number (1-5 training, 6 test):",
+                inputPlaceholder: "Example: 1", btnStart: "Start", btnPause: "Pause", remLabel: "rem", btnNext: "Next ➔",
+                t1Title: "Test 1/3: Speed Counting", t1Inst: "Your task is to count aloud from 1 to 120 as fast as possible.<br><br>Press 'Start' and begin counting. As soon as you say '120', press 'Stop'.",
+                btnStartTest: "Start", btnStopTest: "Stop", btnGoTest2: "Go to Test 2 ➔",
+                t2Title: "Test 2/3: Word Memory", t2Inst1: "You will be given 30 words and 2 minutes to memorize them. Try to remember as many as possible.",
+                t2Inst2: "Memorize the words. You have 2 minutes.", t2Inst3: "Enter all the words you remember (order doesn't matter).",
+                t2Placeholder: "Enter words separated by space or comma...", btnStartMem: "Start Memorizing", btnGoInput: "Done, go to input ➔",
+                btnFinishTest: "Done (Finish)", btnGoTest3: "Go to Test 3 ➔",
+                t3Title: "Test 3/3: Stroop Test", t3Inst: "Name aloud the <b>FONT COLOR</b> of the word, ignoring the word itself.<br><br>Press 'Start', name the colors of all 50 words, then press 'Stop'.",
+                btnFinishAll: "Finish tests and get results", helpTitle: "Help", btnClose: "Close",
+                pauseTitle: "Pause", btnResume: "Resume", errTitle: "Error Analysis", btnUnderstand: "Got it, to results",
+                sumTitle: "Results", sumInst: "Copy the text below and save it to track your progress.", btnCopy: "📋 Copy Results", btnReturn: "Return to Main",
+                jsTime: "Time", jsErrors: "Errors", jsExercise: "Exercise", jsNoHistory: "No completed exercises yet.",
+                jsYourAns: "Your answer", jsCorrectAns: "Correct", jsAlertInput: "Please enter a number from 1 to 6.",
+                jsAlertCopyOk: "Results successfully copied to clipboard!", jsAlertCopyErr: "Failed to copy. Please select text and copy manually.",
+                jsT2Res: "Result", jsT2Mem: "Memorized", jsT2Correct: "Your correct words", jsT2None: "No matches",
+                jsSumTrainDone: "Training Completed!", jsSumTestDone: "Tests Completed!", jsSumDate: "Date", jsSumName: "Name", jsSumMod: "Module", jsSumScore: "Score",
+                jsT1Name: "Test 1 (Count)", jsT2Name: "Test 2 (Words)", jsT3Name: "Test 3 (Stroop)"
+            }
+        };
+
+        const t = (key) => translations[currentLang][key];
+
+        function toggleLang() {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            document.getElementById('lang-toggle-btn').innerText = currentLang === 'ru' ? 'RU' : 'EN';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.innerHTML = t(el.getAttribute('data-i18n'));
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                el.placeholder = t(el.getAttribute('data-i18n-ph'));
+            });
+
+            document.getElementById('help-content-ru').style.display = currentLang === 'ru' ? 'block' : 'none';
+            document.getElementById('help-content-en').style.display = currentLang === 'en' ? 'block' : 'none';
+
+            updateDynamicUI();
+        }
+
+        function updateDynamicUI() {
+            if (document.getElementById('training-screen').classList.contains('active')) {
+                let m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0'), s = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${t('jsTime')}: ${m}:${s}`;
+                document.getElementById('error-count').innerText = `${t('jsErrors')}: ${errorsCount}`;
+                document.getElementById('progress').innerText = `${t('jsExercise')}: ${currentIndex + 1}/100`;
+            }
+        }
+
+        // ================== ИНИЦИАЛИЗАЦИЯ И СТАРТ ==================
         const tg = window.Telegram?.WebApp || {};
-        const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Тестовый Пользователь" };
+        const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User" };
         document.getElementById('ui-user-id').innerText = userData.id;
         document.getElementById('ui-user-name').innerText = userData.first_name;
 
-        // Глобальные переменные для сбора результатов
-        let currentSessionType = "";
-        let currentModuleNumber = "";
-        let globalResults = {
-            date: new Date().toLocaleDateString('ru-RU'),
-            training: { time: "", errors: 0, score: 0 },
-            tests: { test1: "", test2Score: "", test2Percent: "", test3: "" }
-        };
+        let currentSessionType = "", currentModuleNumber = "";
+        let globalResults = { date: new Date().toLocaleDateString(), training: { time: "", errors: 0, score: 0 }, tests: { test1: "", test2Score: "", test2Percent: "", test3: "" } };
 
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -553,15 +657,9 @@
         function startModule() {
             let val = parseInt(document.getElementById('module-input').value);
             currentModuleNumber = val;
-            if (val >= 1 && val <= 5) {
-                currentSessionType = "training";
-                initTraining();
-            } else if (val === 6) {
-                currentSessionType = "tests";
-                switchScreen('test1-screen');
-            } else {
-                alert("Пожалуйста, введите число от 1 до 6.");
-            }
+            if (val >= 1 && val <= 5) { currentSessionType = "training"; initTraining(); }
+            else if (val === 6) { currentSessionType = "tests"; switchScreen('test1-screen'); }
+            else alert(t('jsAlertInput'));
         }
         function openHelp() { document.getElementById('help-modal').classList.add('active'); }
         function closeHelp() { document.getElementById('help-modal').classList.remove('active'); }
@@ -569,47 +667,40 @@
         // ================== ТЕСТ 1 ==================
         let test1StartTime = 0, test1Interval, test1ResultMs = 0;
         function formatStopwatch(ms) {
-            let totalSeconds = Math.floor(ms / 1000);
-            let minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-            let seconds = String(totalSeconds % 60).padStart(2, '0');
-            let tenths = Math.floor((ms % 1000) / 100);
+            let totalSeconds = Math.floor(ms / 1000), minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0'), seconds = String(totalSeconds % 60).padStart(2, '0'), tenths = Math.floor((ms % 1000) / 100);
             return `${minutes}:${seconds}.${tenths}`;
         }
         function startTest1() {
-            document.getElementById('btn-test1-start').style.display = 'none';
-            document.getElementById('btn-test1-stop').style.display = 'block';
-            test1StartTime = Date.now();
-            test1Interval = setInterval(() => { document.getElementById('test1-stopwatch').innerText = formatStopwatch(Date.now() - test1StartTime); }, 100);
+            document.getElementById('btn-test1-start').style.display = 'none'; document.getElementById('btn-test1-stop').style.display = 'block';
+            test1StartTime = Date.now(); test1Interval = setInterval(() => { document.getElementById('test1-stopwatch').innerText = formatStopwatch(Date.now() - test1StartTime); }, 100);
         }
         function stopTest1() {
             clearInterval(test1Interval); test1ResultMs = Date.now() - test1StartTime;
             let formattedTime = formatStopwatch(test1ResultMs);
-            document.getElementById('test1-stopwatch').innerText = formattedTime;
-            globalResults.tests.test1 = formattedTime;
-            document.getElementById('btn-test1-stop').style.display = 'none';
-            document.getElementById('btn-test1-next').style.display = 'block';
+            document.getElementById('test1-stopwatch').innerText = formattedTime; globalResults.tests.test1 = formattedTime;
+            document.getElementById('btn-test1-stop').style.display = 'none'; document.getElementById('btn-test1-next').style.display = 'block';
         }
         function goToTest2() { switchScreen('test2-screen'); }
 
         // ================== ТЕСТ 2 (Слова) ==================
-        const fullDictionary = [
-            "абрикос", "авария", "автобус", "автомат", "адрес", "аист", "актер", "аллея", "альбом", "ананас", "ангел", "апельсин", "аптека", "арбуз", "армия", "артист", "архив", "бабочка", "бабушка", "багаж", "база", "балкон", "банан", "банка", "барабан", "баран", "башня", "бегемот", "беда", "бензин", "берег", "беседа", "библиотека", "билет", "битва", "блин", "блокнот", "болото", "больница", "ботинок", "брат", "бревно", "бровь", "брюки", "буква", "букет", "бумага", "бутылка", "бык", "вагон", "ваза", "ванна", "варенье", "ведро", "веник", "венок", "весна", "ветер", "ветка", "вечер", "вещь", "вилка", "виноград", "вишня", "вкус", "вода", "водитель", "волна", "волос", "волк", "вопрос", "воробей", "ворон", "ворота", "врач", "время", "вторник", "выбор", "выход", "газета", "гайка", "гараж", "гвоздь", "герой", "гитара", "глаз", "глина", "глобус", "гнездо", "голова", "голод", "голос", "голубь", "гора", "город", "горох", "гость", "граница", "гриб", "гроза", "гром", "грудь", "груз", "груша", "грязь", "губа", "гусь", "дверь", "двор", "дворец", "девочка", "девушка", "дед", "дедушка", "дело", "день", "деньги", "дерево", "деревня", "дети", "диван", "директор", "добыча", "дождь", "доктор", "документ", "долг", "долина", "дом", "дорога", "доска", "дочь", "друг", "дуб", "дух", "душа", "дым", "дыня", "дядя", "еда", "ежик", "елка", "жаба", "жажда", "жара", "железо", "жена", "женщина", "живот", "животное", "жизнь", "жир", "жук", "журнал", "забор", "завод", "завтрак", "загадка", "задача", "закон", "замок", "запад", "запах", "запас", "заряд", "звезда", "зверь", "звонок", "звук", "здание", "здоровье", "зебра", "земля", "зеркало", "зерно", "зима", "змея", "знак", "знание", "золото", "зонт", "зуб", "игла", "игра", "идея", "изба", "имя", "инженер", "интерес", "искусство", "искра", "история", "кабан", "кабинет", "камень", "камера", "канал", "канат", "капля", "капуста", "карандаш", "карман", "карта", "картина", "картошка", "касса", "кастрюля", "каша", "квартира", "кепка", "кино", "кисть", "класс", "клетка", "клиент", "клуб", "клубника", "ключ", "книга", "ковер", "кожа", "коза", "колесо", "кольцо", "команда", "комната", "компания", "конец", "конфета", "конь", "корабль", "корень", "корзина", "коробка", "корова", "корона", "коса", "кость", "костюм", "кот", "котел", "кофе", "кошка", "край", "кран", "краска", "кресло", "крест", "кровь", "кролик", "круг", "крыло", "крыса", "крыша", "крючок", "кубик", "кукла", "курица", "кусок", "куст", "кухня", "лагерь", "лампа", "лапа", "ласточка", "лебедь", "лев", "лед", "лекарство", "лес", "лестница", "лето", "летчик", "лимон", "линия", "лиса", "лист", "лицо", "лоб", "лодка", "ложка", "лошадь", "луг", "лук", "луна", "луч", "лыжи", "любовь", "люди", "лягушка", "магазин", "магнитофон", "мазь", "мальчик", "мама", "марка", "масло", "мастер", "машина", "мебель", "мед", "медведь", "медь", "мел", "место", "месяц", "металл", "меч", "мечта", "мешок", "миг", "минута", "мир", "миска", "мозг", "молоко", "молоток", "море", "мороз", "моряк", "мост", "мотор", "мотоцикл", "мужик", "мужчина", "музей", "музыка", "мука", "муравей", "мусор", "муха", "мысль", "мышь", "мясо", "мяч", "награда", "надежда", "народ", "наряд", "насос", "наука", "начало", "небо", "неделя", "нитка", "новость", "нога", "нож", "ножницы", "номер", "нос", "носок", "ночь", "обезьяна", "облако", "обида", "обман", "образ", "обувь", "овощи", "овца", "огонь", "огород", "огурец", "одежда", "одеяло", "озеро", "океан", "окно", "олень", "орел", "орех", "оружие", "осень", "остров", "отец", "отдых", "ответ", "отель", "охота", "ошибка", "палец", "пальто", "память", "папа", "пар", "парк", "парень", "пароход", "паспорт", "пассажир", "пастух", "паук", "паутина", "пекарь", "пена", "пень", "перо", "песня", "песок", "петух", "печать", "печь", "пила", "пилот", "писатель", "письмо", "пища", "пламя", "план", "планета", "платье", "плащ", "плечо", "плита", "плод", "плот", "площадь", "победа", "повар", "погода", "подарок", "подвал", "подруга", "поезд", "пожар", "поиск", "покой", "поле", "полет", "политика", "полка", "полотенце", "польза", "помидор", "помощь", "попугай", "порошок", "порт", "порядок", "посуда", "потолок", "почта", "поэт", "правда", "правило", "праздник", "предмет", "привычка", "приказ", "пример", "природа", "причина", "проблема", "провод", "программа", "прогулка", "продукт", "проект", "профессия", "процесс", "птица", "пуля", "пункт", "путь", "пчела", "пшеница", "пыль", "пятно", "работа", "рабочий", "радость", "радио", "радуга", "разговор", "размер", "район", "ракета", "рама", "рана", "растение", "ребенок", "ребята", "революция", "регион", "результат", "река", "реклама", "ремонт", "ресторан", "рецепт", "речь", "решение", "рис", "рисунок", "рог", "родина", "родители", "родник", "роза", "роль", "роман", "рост", "рот", "рубашка", "рубль", "рука", "рукав", "ручка", "рыба", "рыбак", "рынок", "рюкзак", "ряд", "сабля", "сад", "салат", "сало", "самовар", "самолет", "сапог", "сарай", "сахар", "свадьба", "свет", "свинья", "свобода", "связь", "север", "секрет", "секунда", "село", "семья", "сено", "сердце", "серебро", "сестра", "сеть", "сигарета", "сила", "система", "ситуация", "сказка", "скала", "скамейка", "скорость", "скрипка", "след", "слеза", "слово", "слон", "служба", "слух", "случай", "смех", "смысл", "снег", "собака", "событие", "совет", "сок", "солдат", "солнце", "соловей", "соль", "сон", "сосед", "сосна", "состояние", "сотрудник", "союз", "спина", "спичка", "спорт", "способ", "среда", "стакан", "сталь", "станок", "старик", "старуха", "статья", "стекло", "стена", "степь", "стих", "стол", "столица", "столб", "сторона", "страна", "страх", "стрела", "строитель", "стройка", "студент", "стул", "ступень", "суббота", "суд", "судьба", "сумка", "суп", "сцена", "счастье", "сын", "сыр", "таблица", "тайна", "такси", "талант", "танец", "танк", "тарелка", "театр", "текст", "телевизор", "телефон", "тело", "тема", "темнота", "тень", "теория", "тепло", "территория", "тетрадь", "тетя", "техника", "тигр", "ткань", "товар", "товарищ", "толпа", "тонна", "топор", "точка", "трава", "трактор", "трамвай", "транспорт", "труд", "труба", "туман", "турист", "туфля", "туча", "тыква", "тьма", "тяжесть", "угол", "уголь", "угроза", "удар", "удача", "удовольствие", "ужас", "ужин", "узел", "узор", "улица", "улыбка", "ум", "университет", "управление", "уровень", "урок", "условие", "успех", "установка", "утро", "ухо", "участок", "учебник", "ученик", "ученый", "учитель", "фабрика", "факт", "фамилия", "фантазия", "ферма", "фигура", "физика", "фильм", "фирма", "флаг", "флот", "фон", "фонарь", "форма", "фотография", "фраза", "фрукт", "футбол", "хвост", "химия", "хлеб", "хлопок", "ход", "хозяин", "хозяйство", "холод", "холм", "храм", "художник", "царь", "цветок", "цель", "цена", "центр", "цепь", "церковь", "цифра", "чай", "чайник", "час", "частота", "часть", "часы", "чашка", "человек", "чемодан", "чемпион", "черепаха", "черта", "честь", "четверг", "число", "чистота", "читатель", "член", "чувство", "чудо", "шаг", "шапка", "шар", "шарф", "шахматы", "шесть", "шея", "ширина", "шкаф", "школа", "шкура", "шляпа", "шоколад", "шофер", "шпион", "штора", "штука", "шуба", "шум", "шутка", "щека", "щенок", "щит", "экзамен", "экран", "экскурсия", "электричество", "элемент", "энергия", "эпоха", "этаж", "этап", "юбка", "юг", "юноша", "яблоко", "ягода", "яд", "ядро", "язык", "яйцо", "яма", "январь", "ящерица", "ящик"
-        ];
+        const dictRU = ["абрикос", "авария", "автобус", "автомат", "адрес", "аист", "актер", "аллея", "альбом", "ананас", "ангел", "апельсин", "аптека", "арбуз", "армия", "артист", "архив", "бабочка", "бабушка", "багаж", "база", "балкон", "банан", "банка", "барабан", "баран", "башня", "бегемот", "беда", "бензин", "берег", "беседа", "библиотека", "билет", "битва", "блин", "блокнот", "болото", "больница", "ботинок", "брат", "бревно", "бровь", "брюки", "буква", "букет", "бумага", "бутылка", "бык", "вагон", "ваза", "ванна", "варенье", "ведро", "веник", "венок", "весна", "ветер", "ветка", "вечер", "вещь", "вилка", "виноград", "вишня", "вкус", "вода", "водитель", "волна", "волос", "волк", "вопрос", "воробей", "ворон", "ворота", "врач", "время", "вторник", "выбор", "выход", "газета", "гайка", "гараж", "гвоздь", "герой", "гитара", "глаз", "глина", "глобус", "гнездо", "голова", "голод", "голос", "голубь", "гора", "город", "горох", "гость", "граница", "гриб", "гроза", "гром", "грудь", "груз", "груша", "грязь", "губа", "гусь", "дверь", "двор", "дворец", "девочка", "девушка", "дед", "дедушка", "дело", "день", "деньги", "дерево", "деревня", "дети", "диван", "директор", "добыча", "дождь", "доктор", "документ", "долг", "долина", "дом", "дорога", "доска", "дочь", "друг", "дуб", "дух", "душа", "дым", "дыня", "дядя", "еда", "ежик", "елка", "жаба", "жажда", "жара", "железо", "жена", "женщина", "живот", "животное", "жизнь", "жир", "жук", "журнал", "забор", "завод", "завтрак", "загадка", "задача", "закон", "замок", "запад", "запах", "запас", "заряд", "звезда", "зверь", "звонок", "звук", "здание", "здоровье", "зебра", "земля", "зеркало", "зерно", "зима", "змея", "знак", "знание", "золото", "зонт", "зуб", "игла", "игра", "идея", "изба", "имя", "инженер", "интерес", "искусство", "искра", "история", "кабан", "кабинет", "камень", "камера", "канал", "канат", "капля", "капуста", "карандаш", "карман", "карта", "картина", "картошка", "касса", "кастрюля", "каша", "квартира", "кепка", "кино", "кисть", "класс", "клетка", "клиент", "клуб", "клубника", "ключ", "книга", "ковер", "кожа", "коза", "колесо", "кольцо", "команда", "комната", "компания", "конец", "конфета", "конь", "корабль", "корень", "корзина", "коробка", "корова", "корона", "коса", "кость", "костюм", "кот", "котел", "кофе", "кошка", "край", "кран", "краска", "кресло", "крест", "кровь", "кролик", "круг", "крыло", "крыса", "крыша", "крючок", "кубик", "кукла", "курица", "кусок", "куст", "кухня", "лагерь", "лампа", "лапа", "ласточка", "лебедь", "лев", "лед", "лекарство", "лес", "лестница", "лето", "летчик", "лимон", "линия", "лиса", "лист", "лицо", "лоб", "лодка", "ложка", "лошадь", "луг", "лук", "луна", "луч", "лыжи", "любовь", "люди", "лягушка", "магазин", "магнитофон", "мазь", "мальчик", "мама", "марка", "масло", "мастер", "машина", "мебель", "мед", "медведь", "медь", "мел", "место", "месяц", "металл", "меч", "мечта", "мешок", "миг", "минута", "мир", "миска", "мозг", "молоко", "молоток", "море", "мороз", "моряк", "мост", "мотор", "мотоцикл", "мужик", "мужчина", "музей", "музыка", "мука", "муравей", "мусор", "муха", "мысль", "мышь", "мясо", "мяч", "награда", "надежда", "народ", "наряд", "насос", "наука", "начало", "небо", "неделя", "нитка", "новость", "нога", "нож", "ножницы", "номер", "нос", "носок", "ночь", "обезьяна", "облако", "обида", "обман", "образ", "обувь", "овощи", "овца", "огонь", "огород", "огурец", "одежда", "одеяло", "озеро", "океан", "окно", "олень", "орел", "орех", "оружие", "осень", "остров", "отец", "отдых", "ответ", "отель", "охота", "ошибка", "палец", "пальто", "память", "папа", "пар", "парк", "парень", "пароход", "паспорт", "пассажир", "пастух", "паук", "паутина", "пекарь", "пена", "пень", "перо", "песня", "песок", "петух", "печать", "печь", "пила", "пилот", "писатель", "письмо", "пища", "пламя", "план", "планета", "платье", "плащ", "плечо", "плита", "плод", "плот", "площадь", "победа", "повар", "погода", "подарок", "подвал", "подруга", "поезд", "пожар", "поиск", "покой", "поле", "полет", "политика", "полка", "полотенце", "польза", "помидор", "помощь", "попугай", "порошок", "порт", "порядок", "посуда", "потолок", "почта", "поэт", "правда", "правило", "праздник", "предмет", "привычка", "приказ", "пример", "природа", "причина", "проблема", "провод", "программа", "прогулка", "продукт", "проект", "профессия", "процесс", "птица", "пуля", "пункт", "путь", "пчела", "пшеница", "пыль", "пятно", "работа", "рабочий", "радость", "радио", "радуга", "разговор", "размер", "район", "ракета", "рама", "рана", "растение", "ребенок", "ребята", "революция", "регион", "результат", "река", "реклама", "ремонт", "ресторан", "рецепт", "речь", "решение", "рис", "рисунок", "рог", "родина", "родители", "родник", "роза", "роль", "роман", "рост", "рот", "рубашка", "рубль", "рука", "рукав", "ручка", "рыба", "рыбак", "рынок", "рюкзак", "ряд", "сабля", "сад", "салат", "сало", "самовар", "самолет", "сапог", "сарай", "сахар", "свадьба", "свет", "свинья", "свобода", "связь", "север", "секрет", "секунда", "село", "семья", "сено", "сердце", "серебро", "сестра", "сеть", "сигарета", "сила", "система", "ситуация", "сказка", "скала", "скамейка", "скорость", "скрипка", "след", "слеза", "слово", "слон", "служба", "слух", "случай", "смех", "смысл", "снег", "собака", "событие", "совет", "сок", "солдат", "солнце", "соловей", "соль", "сон", "сосед", "сосна", "состояние", "сотрудник", "союз", "спина", "спичка", "спорт", "способ", "среда", "стакан", "сталь", "станок", "старик", "старуха", "статья", "стекло", "стена", "степь", "стих", "стол", "столица", "столб", "сторона", "страна", "страх", "стрела", "строитель", "стройка", "студент", "стул", "ступень", "суббота", "суд", "судьба", "сумка", "суп", "сцена", "счастье", "сын", "сыр", "таблица", "тайна", "такси", "талант", "танец", "танк", "тарелка", "театр", "текст", "телевизор", "телефон", "тело", "тема", "темнота", "тень", "теория", "тепло", "территория", "тетрадь", "тетя", "техника", "тигр", "ткань", "товар", "товарищ", "толпа", "тонна", "топор", "точка", "трава", "трактор", "трамвай", "транспорт", "труд", "труба", "туман", "турист", "туфля", "туча", "тыква", "тьма", "тяжесть", "угол", "уголь", "угроза", "удар", "удача", "удовольствие", "ужас", "ужин", "узел", "узор", "улица", "улыбка", "ум", "университет", "управление", "уровень", "урок", "условие", "успех", "установка", "утро", "ухо", "участок", "учебник", "ученик", "ученый", "учитель", "фабрика", "факт", "фамилия", "фантазия", "ферма", "фигура", "физика", "фильм", "фирма", "флаг", "флот", "фон", "фонарь", "форма", "фотография", "фраза", "фрукт", "футбол", "хвост", "химия", "хлеб", "хлопок", "ход", "хозяин", "хозяйство", "холод", "холм", "храм", "художник", "царь", "цветок", "цель", "цена", "центр", "цепь", "церковь", "цифра", "чай", "чайник", "час", "частота", "часть", "часы", "чашка", "человек", "чемодан", "чемпион", "черепаха", "черта", "честь", "четверг", "число", "чистота", "читатель", "член", "чувство", "чудо", "шаг", "шапка", "шар", "шарф", "шахматы", "шесть", "шея", "ширина", "шкаф", "школа", "шкура", "шляпа", "шоколад", "шофер", "шпион", "штора", "штука", "шуба", "шум", "шутка", "щека", "щенок", "щит", "экзамен", "экран", "экскурсия", "электричество", "элемент", "энергия", "эпоха", "этаж", "этап", "юбка", "юг", "юноша", "яблоко", "ягода", "яд", "ядро", "язык", "яйцо", "яма", "январь", "ящерица", "ящик"];
+        const dictEN = ["apple", "orange", "banana", "car", "bus", "train", "house", "door", "window", "dog", "cat", "bird", "tree", "flower", "river", "mountain", "sun", "moon", "star", "sky", "water", "fire", "earth", "wind", "book", "pen", "table", "chair", "phone", "computer", "bag", "shoe", "hat", "shirt", "pants", "eye", "ear", "nose", "mouth", "hand", "foot", "friend", "family", "mother", "father", "brother", "sister", "city", "street", "road", "park", "school", "hospital", "bank", "store", "money", "time", "day", "night", "morning", "evening", "week", "month", "year", "game", "music", "art", "history", "science", "math", "idea", "thought", "word", "letter", "number", "color", "shape", "size", "weight", "light", "dark", "sound", "silence", "taste", "smell", "touch", "feeling", "emotion", "love", "hate", "joy", "sadness", "fear", "anger", "surprise", "hope", "dream", "sleep", "wake", "work", "rest", "play", "study", "learn", "teach", "read", "write", "speak", "listen", "watch", "look", "see", "hear", "walk", "run", "jump", "swim", "fly", "drive", "ride", "sail", "travel", "visit", "meet", "part", "join", "leave", "arrive", "depart", "start", "stop", "begin", "end", "finish", "open", "close", "push", "pull", "lift", "drop", "throw", "catch", "hold", "keep", "give", "take", "buy", "sell", "pay", "cost", "price", "value", "quality", "quantity", "measure", "rule", "law", "order", "chaos", "peace", "war", "battle", "fight", "win", "lose", "success", "failure", "danger", "safety", "health", "disease", "medicine", "doctor", "nurse", "patient", "life", "death", "birth", "age", "youth", "adult", "child", "boy", "girl", "man", "woman", "person", "people", "crowd", "group", "team", "class", "club", "society", "world", "planet", "galaxy", "universe", "space", "past", "present", "future"];
+
         let test2TargetWords = [], test2Interval, test2TimeLeft = 120;
 
         function updateTest2Timer() {
-            let m = String(Math.floor(test2TimeLeft / 60)).padStart(2, '0');
-            let s = String(test2TimeLeft % 60).padStart(2, '0');
+            let m = String(Math.floor(test2TimeLeft / 60)).padStart(2, '0'), s = String(test2TimeLeft % 60).padStart(2, '0');
             document.getElementById('test2-timer').innerText = `${m}:${s}`;
         }
 
         function startTest2Phase1() {
-            let shuffled = shuffleArray([...fullDictionary]);
+            let currentDict = currentLang === 'ru' ? dictRU : dictEN;
+            let shuffled = shuffleArray([...currentDict]);
             test2TargetWords = shuffled.slice(0, 30);
             const grid = document.getElementById('test2-words-grid');
             grid.innerHTML = test2TargetWords.map(word => `<div class="word-item">${word}</div>`).join('');
 
-            document.getElementById('test2-instruction').innerText = "Запоминайте слова. У вас 2 минуты.";
+            document.getElementById('test2-instruction').innerText = t('t2Inst2');
             document.getElementById('btn-test2-start').style.display = 'none';
             grid.style.display = 'grid';
             document.getElementById('btn-test2-early').style.display = 'block';
@@ -625,7 +716,7 @@
             clearInterval(test2Interval);
             document.getElementById('test2-words-grid').style.display = 'none';
             document.getElementById('btn-test2-early').style.display = 'none';
-            document.getElementById('test2-instruction').innerText = "Введите все слова, которые удалось запомнить (порядок не важен).";
+            document.getElementById('test2-instruction').innerText = t('t2Inst3');
             document.getElementById('test2-input-area').style.display = 'block';
             document.getElementById('btn-test2-finish').style.display = 'block';
             document.getElementById('test2-textarea').focus();
@@ -645,23 +736,23 @@
             document.getElementById('test2-timer').style.display = 'none';
 
             const userText = document.getElementById('test2-textarea').value.toLowerCase();
-            const userWords = userText.match(/[а-яё]+/g) || [];
+            // Поддержка и русских, и английских букв
+            const userWords = userText.match(/[a-zа-яё]+/g) || [];
             const uniqueUserWords = [...new Set(userWords)];
 
             let matchedWords = [];
             uniqueUserWords.forEach(word => { if (test2TargetWords.includes(word)) matchedWords.push(word); });
 
             let percent = Math.round((matchedWords.length / 30) * 100);
-
             globalResults.tests.test2Score = `${matchedWords.length}/30`;
             globalResults.tests.test2Percent = `${percent}%`;
 
             const resultBox = document.getElementById('test2-result');
             resultBox.style.display = 'block';
             resultBox.innerHTML = `
-                <h3 style="margin-top:0; color:#3390ec;">Результат: ${matchedWords.length} из 30</h3>
-                <p><b>Запомнено:</b> ${percent}%</p>
-                <p><b>Ваши правильные слова:</b> ${matchedWords.length > 0 ? matchedWords.join(', ') : 'Нет совпадений'}</p>
+                <h3 style="margin-top:0; color:#3390ec;">${t('jsT2Res')}: ${matchedWords.length} / 30</h3>
+                <p><b>${t('jsT2Mem')}:</b> ${percent}%</p>
+                <p><b>${t('jsT2Correct')}:</b> ${matchedWords.length > 0 ? matchedWords.join(', ') : t('jsT2None')}</p>
             `;
             document.getElementById('btn-test2-next').style.display = 'block';
         }
@@ -671,56 +762,37 @@
         // ================== ТЕСТ 3 (Струп) ==================
         let test3StartTime = 0, test3Interval, test3ResultMs = 0;
 
-        const stroopData = [
-            { name: "СИНИЙ", color: "#3390ec" },
-            { name: "ЖЁЛТЫЙ", color: "#d1a300" },
-            { name: "КРАСНЫЙ", color: "#ff3b30" },
-            { name: "ЗЕЛЁНЫЙ", color: "#34c759" }
-        ];
+        const stroopRU = [{ name: "СИНИЙ", color: "#3390ec" }, { name: "ЖЁЛТЫЙ", color: "#d1a300" }, { name: "КРАСНЫЙ", color: "#ff3b30" }, { name: "ЗЕЛЁНЫЙ", color: "#34c759" }];
+        const stroopEN = [{ name: "BLUE", color: "#3390ec" }, { name: "YELLOW", color: "#d1a300" }, { name: "RED", color: "#ff3b30" }, { name: "GREEN", color: "#34c759" }];
 
         function startTest3() {
             document.getElementById('btn-test3-start').style.display = 'none';
             document.getElementById('btn-test3-stop').style.display = 'block';
 
+            const stroopData = currentLang === 'ru' ? stroopRU : stroopEN;
             const grid = document.getElementById('test3-grid');
-            let wordsHTML = "";
-            let prevText = "";
-            let prevColor = "";
+            let wordsHTML = "", prevText = "", prevColor = "";
 
             for (let i = 0; i < 50; i++) {
                 let textItem, colorItem;
+                do { textItem = stroopData[Math.floor(Math.random() * stroopData.length)]; } while (textItem.name === prevText);
+                do { colorItem = stroopData[Math.floor(Math.random() * stroopData.length)]; } while (colorItem.name === textItem.name || colorItem.name === prevColor);
 
-                do {
-                    textItem = stroopData[Math.floor(Math.random() * stroopData.length)];
-                } while (textItem.name === prevText);
-
-                do {
-                    colorItem = stroopData[Math.floor(Math.random() * stroopData.length)];
-                } while (colorItem.name === textItem.name || colorItem.name === prevColor);
-
-                prevText = textItem.name;
-                prevColor = colorItem.name;
-
+                prevText = textItem.name; prevColor = colorItem.name;
                 wordsHTML += `<div class="stroop-word" style="color: ${colorItem.color};">${textItem.name}</div>`;
             }
 
-            grid.innerHTML = wordsHTML;
-            grid.style.display = 'flex';
-
+            grid.innerHTML = wordsHTML; grid.style.display = 'flex';
             test3StartTime = Date.now();
             test3Interval = setInterval(() => { document.getElementById('test3-stopwatch').innerText = formatStopwatch(Date.now() - test3StartTime); }, 100);
         }
 
         function stopTest3() {
-            clearInterval(test3Interval);
-            test3ResultMs = Date.now() - test3StartTime;
+            clearInterval(test3Interval); test3ResultMs = Date.now() - test3StartTime;
             let formattedTime = formatStopwatch(test3ResultMs);
-            document.getElementById('test3-stopwatch').innerText = formattedTime;
-            globalResults.tests.test3 = formattedTime;
-
+            document.getElementById('test3-stopwatch').innerText = formattedTime; globalResults.tests.test3 = formattedTime;
             document.getElementById('test3-grid').style.display = 'none';
-            document.getElementById('btn-test3-stop').style.display = 'none';
-            document.getElementById('btn-test3-finish').style.display = 'block';
+            document.getElementById('btn-test3-stop').style.display = 'none'; document.getElementById('btn-test3-finish').style.display = 'block';
         }
 
         // ================== ЛОГИКА ТРЕНИРОВКИ ==================
@@ -728,15 +800,32 @@
         const inputX = document.getElementById('input-x'), inputY = document.getElementById('input-y'), remainderGroup = document.getElementById('remainder-group');
 
         function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } return array; }
+
         function generateTasks() {
             let allTasks = [], addPool = [], mulPool = [], subPool = [], divPool = [];
-            for (let a = 2; a <= 9; a++) for (let b = a + 1; b <= 9; b++) addPool.push({ op: '+', a: a, b: b, ansX: a + b, ansY: 0 });
-            for (let a = 2; a <= 9; a++) for (let b = a + 1; b <= 9; b++) mulPool.push({ op: '*', a: a, b: b, ansX: a * b, ansY: 0 });
-            for (let a = 2; a <= 19; a++) for (let b = 2; b <= 9; b++) if (a > b) subPool.push({ op: '-', a: a, b: b, ansX: a - b, ansY: 0 });
+            for (let a = 2; a <= 9; a++) {
+                for (let b = a; b <= 9; b++) {
+                    let n1 = a, n2 = b;
+                    if (a !== b && Math.random() > 0.5) { n1 = b; n2 = a; }
+                    addPool.push({ op: '+', a: n1, b: n2, ansX: n1 + n2, ansY: 0 });
+                    mulPool.push({ op: '*', a: n1, b: n2, ansX: n1 * n2, ansY: 0 });
+                }
+            }
+            for (let a = 2; a <= 19; a++) {
+                for (let b = 2; b <= 9; b++) {
+                    if (a - b > 1 && (a <= 10 || a - b < 10)) {
+                        subPool.push({ op: '-', a: a, b: b, ansX: a - b, ansY: 0 });
+                    }
+                }
+            }
             for (let b = 2; b <= 9; b++) {
                 for (let q = 2; q <= 9; q++) {
-                    let a_no = b * q; if (a_no >= 2 && a_no <= 19 && a_no !== b) divPool.push({ op: '/', a: a_no, b: b, ansX: q, ansY: 0 });
-                    for (let r = 2; r < b; r++) { let a_rem = b * q + r; if (a_rem >= 2 && a_rem <= 19 && a_rem !== b) divPool.push({ op: '/', a: a_rem, b: b, ansX: q, ansY: r }); }
+                    let a_no = b * q;
+                    if (a_no >= 2 && a_no <= 19 && a_no !== b) divPool.push({ op: '/', a: a_no, b: b, ansX: q, ansY: 0 });
+                    for (let r = 2; r < b; r++) {
+                        let a_rem = b * q + r;
+                        if (a_rem >= 2 && a_rem <= 19 && a_rem !== b) divPool.push({ op: '/', a: a_rem, b: b, ansX: q, ansY: r });
+                    }
                 }
             }
             return shuffleArray([].concat(shuffleArray(addPool).slice(0, 25), shuffleArray(mulPool).slice(0, 25), shuffleArray(subPool).slice(0, 25), shuffleArray(divPool).slice(0, 25)));
@@ -748,12 +837,12 @@
             inputY.addEventListener('input', function () { this.value = this.value.replace(/[^0-9]/g, ''); });
             startTimer(); showTask();
         }
-        function startTimer() { timerInterval = setInterval(() => { if (!isPaused) { secondsElapsed++; let m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0'), s = String(secondsElapsed % 60).padStart(2, '0'); document.getElementById('timer').innerText = `Время: ${m}:${s}`; } }, 1000); }
+        function startTimer() { timerInterval = setInterval(() => { if (!isPaused) { secondsElapsed++; updateDynamicUI(); } }, 1000); }
         function showTask() {
             if (currentIndex >= tasks.length) { endTraining(); return; }
             let task = tasks[currentIndex];
             document.getElementById('equation').innerText = `${task.a} ${task.op} ${task.b} =`;
-            document.getElementById('progress').innerText = `Упражнение: ${currentIndex + 1}/100`;
+            updateDynamicUI();
             inputX.value = ''; inputY.value = '';
             if (task.op === '/') remainderGroup.classList.add('active'); else remainderGroup.classList.remove('active');
             inputX.focus();
@@ -761,90 +850,64 @@
         function handleNextClick() { if (!isPaused) checkAnswer(); }
         function checkAnswer() {
             let task = tasks[currentIndex], valX = parseInt(inputX.value) || 0, valY = parseInt(inputY.value) || 0, isCorrect = (valX === task.ansX && valY === task.ansY);
-            if (!isCorrect) { errorsCount++; document.getElementById('error-count').innerText = `Ошибок: ${errorsCount}`; }
+            if (!isCorrect) { errorsCount++; updateDynamicUI(); }
             history.push({ task: task, userX: valX, userY: valY, isCorrect: isCorrect });
             currentIndex++; showTask();
         }
         function pauseTraining() {
             isPaused = true; document.getElementById('pause-modal').classList.add('active');
-            document.getElementById('pause-history').innerHTML = history.map(h => `<div class="history-item ${h.isCorrect ? 'correct-text' : 'error-text'}">${h.task.a} ${h.task.op} ${h.task.b} = ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ост ${h.userY}` : ''}</div>`).join('') || '<p>Пока нет решенных упражнений.</p>';
+            document.getElementById('pause-history').innerHTML = history.map(h => `<div class="history-item ${h.isCorrect ? 'correct-text' : 'error-text'}">${h.task.a} ${h.task.op} ${h.task.b} = ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ${t('remLabel')} ${h.userY}` : ''}</div>`).join('') || `<p>${t('jsNoHistory')}</p>`;
         }
         function resumeTraining() { isPaused = false; document.getElementById('pause-modal').classList.remove('active'); inputX.focus(); }
 
         function endTraining() {
             clearInterval(timerInterval);
             globalResults.training.time = `${String(Math.floor(secondsElapsed / 60)).padStart(2, '0')}:${String(secondsElapsed % 60).padStart(2, '0')}`;
-            globalResults.training.errors = errorsCount;
-            globalResults.training.score = Math.max(0, 100 - (errorsCount * 2));
+            globalResults.training.errors = errorsCount; globalResults.training.score = Math.max(0, 100 - (errorsCount * 2));
 
             if (errorsCount > 0) {
-                document.getElementById('errors-list').innerHTML = history.filter(h => !h.isCorrect).map(h => `<div class="history-item"><b>${h.task.a} ${h.task.op} ${h.task.b}</b><br><span class="error-text">Ваш ответ: ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ост ${h.userY}` : ''}</span><br><span class="correct-text">Правильный: ${h.task.ansX}${h.task.op === '/' && h.task.ansY > 0 ? ` ост ${h.task.ansY}` : ''}</span><hr></div>`).join('');
+                document.getElementById('errors-list').innerHTML = history.filter(h => !h.isCorrect).map(h => `<div class="history-item"><b>${h.task.a} ${h.task.op} ${h.task.b}</b><br><span class="error-text">${t('jsYourAns')}: ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ${t('remLabel')} ${h.userY}` : ''}</span><br><span class="correct-text">${t('jsCorrectAns')}: ${h.task.ansX}${h.task.op === '/' && h.task.ansY > 0 ? ` ${t('remLabel')} ${h.task.ansY}` : ''}</span><hr></div>`).join('');
                 document.getElementById('errors-modal').classList.add('active');
-            } else {
-                generateGlobalSummary();
-            }
+            } else { generateGlobalSummary(); }
         }
 
-        function showTrainingSummary() {
-            document.getElementById('errors-modal').classList.remove('active');
-            generateGlobalSummary();
-        }
+        function showTrainingSummary() { document.getElementById('errors-modal').classList.remove('active'); generateGlobalSummary(); }
 
         // ================== ГЛОБАЛЬНЫЙ ВЫВОД И КОПИРОВАНИЕ ==================
         function generateGlobalSummary() {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('global-summary-modal').classList.add('active');
 
-            let reportText = `Дата: ${globalResults.date}\n`;
-            reportText += `Имя: ${userData.first_name}\n`;
-            reportText += `ID: ${userData.id}\n`;
-            reportText += `Модуль: ${currentModuleNumber}\n`;
-            reportText += `-----------------------\n`;
+            let reportText = `${t('jsSumDate')}: ${globalResults.date}\n${t('jsSumName')}: ${userData.first_name}\nID: ${userData.id}\n${t('jsSumMod')}: ${currentModuleNumber}\n-----------------------\n`;
 
             if (currentSessionType === "training") {
-                document.getElementById('summary-title').innerText = "Тренировка завершена!";
-                reportText += `Время: ${globalResults.training.time}\n`;
-                reportText += `Ошибок: ${globalResults.training.errors}\n`;
-                reportText += `Оценка: ${globalResults.training.score}/100\n`;
+                document.getElementById('summary-title').innerText = t('jsSumTrainDone');
+                reportText += `${t('jsTime')}: ${globalResults.training.time}\n${t('jsErrors')}: ${globalResults.training.errors}\n${t('jsSumScore')}: ${globalResults.training.score}/100\n`;
             } else if (currentSessionType === "tests") {
-                document.getElementById('summary-title').innerText = "Тесты завершены!";
-                reportText += `Тест 1 (Счет): ${globalResults.tests.test1}\n`;
-                reportText += `Тест 2 (Слова): ${globalResults.tests.test2Score} (${globalResults.tests.test2Percent})\n`;
-                reportText += `Тест 3 (Струп): ${globalResults.tests.test3}\n`;
+                document.getElementById('summary-title').innerText = t('jsSumTestDone');
+                reportText += `${t('jsT1Name')}: ${globalResults.tests.test1}\n${t('jsT2Name')}: ${globalResults.tests.test2Score} (${globalResults.tests.test2Percent})\n${t('jsT3Name')}: ${globalResults.tests.test3}\n`;
             }
 
             document.getElementById('copy-text-area').value = reportText;
-
-            // Устанавливаем фокус на кнопку копирования с небольшой задержкой для отрисовки модального окна
-            setTimeout(() => {
-                document.getElementById('btn-copy-results').focus();
-            }, 100);
+            setTimeout(() => { document.getElementById('btn-copy-results').focus(); }, 100);
         }
 
         function copyResults() {
             const copyText = document.getElementById('copy-text-area');
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
+            copyText.select(); copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value).then(() => {
-                alert("Результаты успешно скопированы в буфер обмена!");
-                document.getElementById('btn-return-main').focus(); // Фокус на кнопку "Вернуться на главную"
+                alert(t('jsAlertCopyOk')); document.getElementById('btn-return-main').focus();
             }).catch(err => {
-                alert("Не удалось скопировать. Пожалуйста, выделите текст и скопируйте вручную.");
-                document.getElementById('btn-return-main').focus();
+                alert(t('jsAlertCopyErr')); document.getElementById('btn-return-main').focus();
             });
         }
 
-        // ================== ГЛОБАЛЬНЫЙ ОБРАБОТЧИК КЛАВИШИ ENTER ==================
-        window.onload = function () {
-            document.getElementById('module-input').focus();
-        };
+        // ================== ОБРАБОТЧИК ENTER ==================
+        window.onload = function () { document.getElementById('module-input').focus(); };
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
-                if (document.activeElement.tagName === 'BUTTON' || document.activeElement.tagName === 'TEXTAREA') {
-                    return;
-                }
-
+                if (document.activeElement.tagName === 'BUTTON' || document.activeElement.tagName === 'TEXTAREA') return;
                 const activeScreen = document.querySelector('.screen.active');
                 if (!activeScreen) return;
 
@@ -854,31 +917,16 @@
                     if (task.op === '/') {
                         if (document.activeElement === inputX) inputY.focus();
                         else if (document.activeElement === inputY) checkAnswer();
-                    } else {
-                        checkAnswer();
-                    }
+                    } else checkAnswer();
                     return;
                 }
-
-                if (activeScreen.id === 'start-screen') {
-                    e.preventDefault();
-                    startModule();
-                    return;
-                }
+                if (activeScreen.id === 'start-screen') { e.preventDefault(); startModule(); return; }
 
                 const primaryBtn = Array.from(activeScreen.querySelectorAll('.btn-next, .btn-stop')).find(btn => window.getComputedStyle(btn).display !== 'none');
-
-                if (primaryBtn) {
-                    e.preventDefault();
-                    primaryBtn.click();
-                }
+                if (primaryBtn) { e.preventDefault(); primaryBtn.click(); }
             }
-
             if (e.key === 'Tab' && document.querySelector('.screen.active')?.id === 'training-screen') {
-                if (e.shiftKey && document.activeElement === inputY) {
-                    e.preventDefault();
-                    inputX.focus();
-                }
+                if (e.shiftKey && document.activeElement === inputY) { e.preventDefault(); inputX.focus(); }
             }
         });
     </script>
