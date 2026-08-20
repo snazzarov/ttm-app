@@ -548,8 +548,8 @@
     <div id="errors-modal" class="modal">
         <h2 data-i18n="errTitle">Разбор ошибок</h2>
         <div id="errors-list"></div>
-        <button class="btn btn-next" onclick="showTrainingSummary()" data-i18n="btnUnderstand">Понятно, к
-            итогам</button>
+        <button id="btn-understand-errors" class="btn btn-next" onclick="showTrainingSummary()"
+            data-i18n="btnUnderstand">Понятно, к итогам</button>
     </div>
 
     <!-- ГЛОБАЛЬНЫЙ ЭКРАН ИТОГОВ -->
@@ -601,7 +601,7 @@
                 btnFinishTest: "Done (Finish)", btnGoTest3: "Go to Test 3 ➔",
                 t3Title: "Test 3/3: Stroop Test", t3Inst: "Name aloud the <b>FONT COLOR</b> of the word, ignoring the word itself.<br><br>Press 'Start', name the colors of all 50 words, then press 'Stop'.",
                 btnFinishAll: "Finish tests and get results", helpTitle: "Help", btnClose: "Close",
-                pauseTitle: "Pause", btnResume: "Resume", errTitle: "Error Analysis", btnUnderstand: "Got it, to results",
+                pauseTitle: "Pause", btnResume: "Resume", errTitle: "Error Analysis", btnUnderstand: "Proceed to results",
                 sumTitle: "Results", sumInst: "Copy the text below and save it to track your progress.", btnCopy: "📋 Copy Results", btnReturn: "Return to Main",
                 jsTime: "Time", jsErrors: "Errors", jsExercise: "Exercise", jsNoHistory: "No completed exercises yet.",
                 jsYourAns: "Your answer", jsCorrectAns: "Correct", jsAlertInput: "Please enter a number from 1 to 6.",
@@ -736,7 +736,6 @@
             document.getElementById('test2-timer').style.display = 'none';
 
             const userText = document.getElementById('test2-textarea').value.toLowerCase();
-            // Поддержка и русских, и английских букв
             const userWords = userText.match(/[a-zа-яё]+/g) || [];
             const uniqueUserWords = [...new Set(userWords)];
 
@@ -838,6 +837,7 @@
             startTimer(); showTask();
         }
         function startTimer() { timerInterval = setInterval(() => { if (!isPaused) { secondsElapsed++; updateDynamicUI(); } }, 1000); }
+
         function showTask() {
             if (currentIndex >= tasks.length) { endTraining(); return; }
             let task = tasks[currentIndex];
@@ -847,17 +847,21 @@
             if (task.op === '/') remainderGroup.classList.add('active'); else remainderGroup.classList.remove('active');
             inputX.focus();
         }
+
         function handleNextClick() { if (!isPaused) checkAnswer(); }
+
         function checkAnswer() {
             let task = tasks[currentIndex], valX = parseInt(inputX.value) || 0, valY = parseInt(inputY.value) || 0, isCorrect = (valX === task.ansX && valY === task.ansY);
             if (!isCorrect) { errorsCount++; updateDynamicUI(); }
             history.push({ task: task, userX: valX, userY: valY, isCorrect: isCorrect });
             currentIndex++; showTask();
         }
+
         function pauseTraining() {
             isPaused = true; document.getElementById('pause-modal').classList.add('active');
             document.getElementById('pause-history').innerHTML = history.map(h => `<div class="history-item ${h.isCorrect ? 'correct-text' : 'error-text'}">${h.task.a} ${h.task.op} ${h.task.b} = ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ${t('remLabel')} ${h.userY}` : ''}</div>`).join('') || `<p>${t('jsNoHistory')}</p>`;
         }
+
         function resumeTraining() { isPaused = false; document.getElementById('pause-modal').classList.remove('active'); inputX.focus(); }
 
         function endTraining() {
@@ -868,10 +872,18 @@
             if (errorsCount > 0) {
                 document.getElementById('errors-list').innerHTML = history.filter(h => !h.isCorrect).map(h => `<div class="history-item"><b>${h.task.a} ${h.task.op} ${h.task.b}</b><br><span class="error-text">${t('jsYourAns')}: ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ${t('remLabel')} ${h.userY}` : ''}</span><br><span class="correct-text">${t('jsCorrectAns')}: ${h.task.ansX}${h.task.op === '/' && h.task.ansY > 0 ? ` ${t('remLabel')} ${h.task.ansY}` : ''}</span><hr></div>`).join('');
                 document.getElementById('errors-modal').classList.add('active');
-            } else { generateGlobalSummary(); }
+
+                // Ставим фокус на кнопку "Понятно, к итогам"
+                setTimeout(() => { document.getElementById('btn-understand-errors').focus(); }, 100);
+            } else {
+                generateGlobalSummary();
+            }
         }
 
-        function showTrainingSummary() { document.getElementById('errors-modal').classList.remove('active'); generateGlobalSummary(); }
+        function showTrainingSummary() {
+            document.getElementById('errors-modal').classList.remove('active');
+            generateGlobalSummary();
+        }
 
         // ================== ГЛОБАЛЬНЫЙ ВЫВОД И КОПИРОВАНИЕ ==================
         function generateGlobalSummary() {
@@ -907,24 +919,44 @@
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
+                // Если фокус на кнопке или поле текста - ничего не делаем, браузер сам нажмет кнопку
                 if (document.activeElement.tagName === 'BUTTON' || document.activeElement.tagName === 'TEXTAREA') return;
+
+                // Если открыто окно ошибок - нажимаем кнопку "Понятно"
+                if (document.getElementById('errors-modal').classList.contains('active')) {
+                    e.preventDefault();
+                    document.getElementById('btn-understand-errors').click();
+                    return;
+                }
+
+                // Если открыто окно итогов - ничего не делаем (там работает фокус)
+                if (document.getElementById('global-summary-modal').classList.contains('active')) return;
+
                 const activeScreen = document.querySelector('.screen.active');
                 if (!activeScreen) return;
 
+                // Логика для экрана тренировки
                 if (activeScreen.id === 'training-screen') {
                     e.preventDefault();
                     let task = tasks[currentIndex];
+                    if (!task) return; // Защита от ошибки после 100-го примера
+
                     if (task.op === '/') {
                         if (document.activeElement === inputX) inputY.focus();
                         else if (document.activeElement === inputY) checkAnswer();
                     } else checkAnswer();
                     return;
                 }
+
+                // Логика для стартового экрана
                 if (activeScreen.id === 'start-screen') { e.preventDefault(); startModule(); return; }
 
+                // Для остальных экранов (тестов) ищем зеленую/красную кнопку и жмем
                 const primaryBtn = Array.from(activeScreen.querySelectorAll('.btn-next, .btn-stop')).find(btn => window.getComputedStyle(btn).display !== 'none');
                 if (primaryBtn) { e.preventDefault(); primaryBtn.click(); }
             }
+
+            // Логика для Tab (остаток при делении)
             if (e.key === 'Tab' && document.querySelector('.screen.active')?.id === 'training-screen') {
                 if (e.shiftKey && document.activeElement === inputY) { e.preventDefault(); inputX.focus(); }
             }
