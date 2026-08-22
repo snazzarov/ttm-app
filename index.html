@@ -614,8 +614,24 @@
 
         const t = (key) => translations[currentLang][key];
 
-        function toggleLang() {
-            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+        // function toggleLang() {
+        //     currentLang = currentLang === 'ru' ? 'en' : 'ru';
+        //     document.getElementById('lang-toggle-btn').innerText = currentLang === 'ru' ? 'RU' : 'EN';
+
+        //     document.querySelectorAll('[data-i18n]').forEach(el => {
+        //         el.innerHTML = t(el.getAttribute('data-i18n'));
+        //     });
+        //     document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        //         el.placeholder = t(el.getAttribute('data-i18n-ph'));
+        //     });
+
+        //     document.getElementById('help-content-ru').style.display = currentLang === 'ru' ? 'block' : 'none';
+        //     document.getElementById('help-content-en').style.display = currentLang === 'en' ? 'block' : 'none';
+
+        //     updateDynamicUI();
+        // }
+
+        function applyLanguage() {
             document.getElementById('lang-toggle-btn').innerText = currentLang === 'ru' ? 'RU' : 'EN';
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -631,6 +647,11 @@
             updateDynamicUI();
         }
 
+        function toggleLang() {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            applyLanguage();
+        }
+
         function updateDynamicUI() {
             if (document.getElementById('training-screen').classList.contains('active')) {
                 let m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0'), s = String(secondsElapsed % 60).padStart(2, '0');
@@ -641,14 +662,22 @@
         }
 
         // ================== ИНИЦИАЛИЗАЦИЯ И СТАРТ ==================
+        // const tg = window.Telegram?.WebApp || {};
+        // const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User" };
+        // document.getElementById('ui-user-id').innerText = userData.id;
+        // document.getElementById('ui-user-name').innerText = userData.first_name;
+
+        // ================== ИНИЦИАЛИЗАЦИЯ И СТАРТ ==================
         const tg = window.Telegram?.WebApp || {};
-        const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User" };
+        const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User", language_code: "ru" };
         document.getElementById('ui-user-id').innerText = userData.id;
         document.getElementById('ui-user-name').innerText = userData.first_name;
 
+        // Автоматическое определение языка из Telegram
+        currentLang = (userData.language_code && userData.language_code.toLowerCase() === 'ru') ? 'ru' : 'en';
+        applyLanguage();
         let currentSessionType = "", currentModuleNumber = "";
         let globalResults = { date: new Date().toLocaleDateString(), training: { time: "", errors: 0, score: 0 }, tests: { test1: "", test2Score: "", test2Percent: "", test3: "" } };
-
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
