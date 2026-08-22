@@ -670,7 +670,8 @@
         // ================== ИНИЦИАЛИЗАЦИЯ И СТАРТ ==================
         const tg = window.Telegram?.WebApp || {};
         const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User", language_code: "ru" };
-        document.getElementById('ui-user-id').innerText = userData.id;
+        //   document.getElementById('ui-user-id').innerText = userData.id;
+        document.getElementById('ui-user-id').innerText = userData.id + " [" + (userData.language_code || "none") + "]";
         document.getElementById('ui-user-name').innerText = userData.first_name;
 
         // Автоматическое определение языка из Telegram
