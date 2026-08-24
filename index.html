@@ -396,7 +396,16 @@
             <p data-i18n="appDesc">Train and Tests Mind</p>
             <div class="user-info">
                 <div><b>ID:</b> <span id="ui-user-id">...</span></div>
-                <div><b data-i18n="nameLabel">Имя:</b> <span id="ui-user-name">...</span></div>
+                <div>
+                    <b data-i18n="nameLabel">Имя:</b>
+                    <span id="ui-user-name">...</span>
+                    <!-- Поле ввода имени для Web-версии -->
+                    <div id="web-name-input-group" style="display: none; margin-top: 5px;">
+                        <input type="text" id="web-name-input" data-i18n-ph="namePlaceholder"
+                            placeholder="Введите ваше имя"
+                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+                    </div>
+                </div>
             </div>
             <div class="input-group">
                 <label for="module-input" data-i18n="inputLabel">Введите номер (1-5 тренировка, 6 тест):</label>
@@ -516,6 +525,8 @@
                 тестов.</p>
             <h3>3. Сохранение результатов</h3>
             <p>По окончании результаты можно скопировать в буфер обмена.</p>
+            <p><b>Наш бот в Telegram:</b> <a href="https://t.me/tt_mind_bot" target="_blank"
+                    style="color: #3390ec; text-decoration: none; font-weight: bold;">@tt_mind_bot</a></p>
         </div>
         <div class="help-content" id="help-content-en" style="display: none;">
             <p>The TTM program uses mind training techniques developed by Japanese scientist Ryuta Kawashima.</p>
@@ -533,6 +544,8 @@
                 tests.</p>
             <h3>3. Saving Results</h3>
             <p>Upon completion, results can be copied to the clipboard.</p>
+            <p><b>Our Telegram bot:</b> <a href="https://t.me/tt_mind_bot" target="_blank"
+                    style="color: #3390ec; text-decoration: none; font-weight: bold;">@tt_mind_bot</a></p>
         </div>
         <button class="btn" onclick="closeHelp()" style="margin-top: 20px;" data-i18n="btnClose">Закрыть</button>
     </div>
@@ -571,7 +584,7 @@
 
         const translations = {
             ru: {
-                appDesc: "Train and Tests Mind", nameLabel: "Имя:", inputLabel: "Введите номер (1-5 тренировка, 6 тест):",
+                appDesc: "Train and Tests Mind", nameLabel: "Имя:", namePlaceholder: "Введите ваше имя", inputLabel: "Введите номер (1-5 тренировка, 6 тест):",
                 inputPlaceholder: "Например: 1", btnStart: "Запустить", btnPause: "Пауза", remLabel: "ост", btnNext: "Дальше ➔",
                 t1Title: "Тест 1/3: Скорость счета", t1Inst: "Ваша задача — как можно быстрее сосчитать вслух от 1 до 120.<br><br>Нажмите «Старт» и начните считать. Как только произнесете «120», сразу нажмите «Стоп».",
                 btnStartTest: "Старт", btnStopTest: "Стоп", btnGoTest2: "Перейти ко 2 тесту ➔",
@@ -585,13 +598,15 @@
                 sumTitle: "Результаты", sumInst: "Скопируйте текст ниже и сохраните его для отслеживания прогресса.", btnCopy: "📋 Скопировать результаты", btnReturn: "Вернуться на главную",
                 jsTime: "Время", jsErrors: "Ошибок", jsExercise: "Упражнение", jsNoHistory: "Пока нет решенных упражнений.",
                 jsYourAns: "Ваш ответ", jsCorrectAns: "Правильный", jsAlertInput: "Пожалуйста, введите число от 1 до 6.",
+                jsAlertName: "Пожалуйста, введите ваше имя перед стартом.",
                 jsAlertCopyOk: "Результаты успешно скопированы в буфер обмена!", jsAlertCopyErr: "Не удалось скопировать. Пожалуйста, выделите текст и скопируйте вручную.",
                 jsT2Res: "Результат", jsT2Mem: "Запомнено", jsT2Correct: "Ваши правильные слова", jsT2None: "Нет совпадений",
                 jsSumTrainDone: "Тренировка завершена!", jsSumTestDone: "Тесты завершены!", jsSumDate: "Дата", jsSumName: "Имя", jsSumMod: "Модуль", jsSumScore: "Оценка",
-                jsT1Name: "Тест 1 (Счет)", jsT2Name: "Тест 2 (Слова)", jsT3Name: "Тест 3 (Струп)"
+                jsT1Name: "Тест 1 (Счет)", jsT2Name: "Тест 2 (Слова)", jsT3Name: "Тест 3 (Струп)",
+                jsViralLink: "\n🧠 Тренируй мозг тут: @tt_mind_bot"
             },
             en: {
-                appDesc: "Train and Tests Mind", nameLabel: "Name:", inputLabel: "Enter number (1-5 training, 6 test):",
+                appDesc: "Train and Tests Mind", nameLabel: "Name:", namePlaceholder: "Enter your name", inputLabel: "Enter number (1-5 training, 6 test):",
                 inputPlaceholder: "Example: 1", btnStart: "Start", btnPause: "Pause", remLabel: "rem", btnNext: "Next ➔",
                 t1Title: "Test 1/3: Speed Counting", t1Inst: "Your task is to count aloud from 1 to 120 as fast as possible.<br><br>Press 'Start' and begin counting. As soon as you say '120', press 'Stop'.",
                 btnStartTest: "Start", btnStopTest: "Stop", btnGoTest2: "Go to Test 2 ➔",
@@ -605,31 +620,16 @@
                 sumTitle: "Results", sumInst: "Copy the text below and save it to track your progress.", btnCopy: "📋 Copy Results", btnReturn: "Return to Main",
                 jsTime: "Time", jsErrors: "Errors", jsExercise: "Exercise", jsNoHistory: "No completed exercises yet.",
                 jsYourAns: "Your answer", jsCorrectAns: "Correct", jsAlertInput: "Please enter a number from 1 to 6.",
+                jsAlertName: "Please enter your name before starting.",
                 jsAlertCopyOk: "Results successfully copied to clipboard!", jsAlertCopyErr: "Failed to copy. Please select text and copy manually.",
                 jsT2Res: "Result", jsT2Mem: "Memorized", jsT2Correct: "Your correct words", jsT2None: "No matches",
                 jsSumTrainDone: "Training Completed!", jsSumTestDone: "Tests Completed!", jsSumDate: "Date", jsSumName: "Name", jsSumMod: "Module", jsSumScore: "Score",
-                jsT1Name: "Test 1 (Count)", jsT2Name: "Test 2 (Words)", jsT3Name: "Test 3 (Stroop)"
+                jsT1Name: "Test 1 (Count)", jsT2Name: "Test 2 (Words)", jsT3Name: "Test 3 (Stroop)",
+                jsViralLink: "\n🧠 Train your brain here: @tt_mind_bot"
             }
         };
 
         const t = (key) => translations[currentLang][key];
-
-        // function toggleLang() {
-        //     currentLang = currentLang === 'ru' ? 'en' : 'ru';
-        //     document.getElementById('lang-toggle-btn').innerText = currentLang === 'ru' ? 'RU' : 'EN';
-
-        //     document.querySelectorAll('[data-i18n]').forEach(el => {
-        //         el.innerHTML = t(el.getAttribute('data-i18n'));
-        //     });
-        //     document.querySelectorAll('[data-i18n-ph]').forEach(el => {
-        //         el.placeholder = t(el.getAttribute('data-i18n-ph'));
-        //     });
-
-        //     document.getElementById('help-content-ru').style.display = currentLang === 'ru' ? 'block' : 'none';
-        //     document.getElementById('help-content-en').style.display = currentLang === 'en' ? 'block' : 'none';
-
-        //     updateDynamicUI();
-        // }
 
         function applyLanguage() {
             document.getElementById('lang-toggle-btn').innerText = currentLang === 'ru' ? 'RU' : 'EN';
@@ -661,36 +661,77 @@
             }
         }
 
-        // ================== ИНИЦИАЛИЗАЦИЯ И СТАРТ ==================
-        // const tg = window.Telegram?.WebApp || {};
-        // const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User" };
-        // document.getElementById('ui-user-id').innerText = userData.id;
-        // document.getElementById('ui-user-name').innerText = userData.first_name;
-
-        // ================== ИНИЦИАЛИЗАЦИЯ И СТАРТ ==================
+        // ================== ИНИЦИАЛИЗАЦИЯ (УНИВЕРСАЛЬНАЯ TG + WEB) ==================
         const tg = window.Telegram?.WebApp || {};
-        const userData = tg.initDataUnsafe?.user || { id: 7777777, first_name: "Test User", language_code: "ru" };
-        //   document.getElementById('ui-user-id').innerText = userData.id;
-        document.getElementById('ui-user-id').innerText = userData.id + " [" + (userData.language_code || "none") + "]";
-        document.getElementById('ui-user-name').innerText = userData.first_name;
+        const isTgApp = tg.initData !== undefined && tg.initData !== ""; // Проверяем, открыто ли в Телеграме
 
-        // Автоматическое определение языка из Telegram
-        currentLang = (userData.language_code && userData.language_code.toLowerCase() === 'ru') ? 'ru' : 'en';
+        let userData = { id: "", first_name: "" };
+
+        if (isTgApp) {
+            // ЛОГИКА ДЛЯ TELEGRAM
+            userData = tg.initDataUnsafe?.user || { id: "TG_USER", first_name: "User" };
+            currentLang = (userData.language_code && userData.language_code.toLowerCase() === 'ru') ? 'ru' : 'en';
+
+            document.getElementById('ui-user-id').innerText = userData.id;
+            document.getElementById('ui-user-name').innerText = userData.first_name;
+        } else {
+            // ЛОГИКА ДЛЯ ОБЫЧНОГО БРАУЗЕРА (WEB)
+            let savedName = localStorage.getItem('ttm_user_name');
+            let savedId = localStorage.getItem('ttm_user_id');
+
+            if (!savedId) {
+                savedId = 'W' + Math.floor(Math.random() * 1000000);
+                localStorage.setItem('ttm_user_id', savedId);
+            }
+            userData.id = savedId;
+            document.getElementById('ui-user-id').innerText = userData.id;
+
+            // Определяем язык по языку браузера
+            let browserLang = (navigator.language || navigator.userLanguage || "en").substring(0, 2).toLowerCase();
+            currentLang = (browserLang === 'ru') ? 'ru' : 'en';
+
+            if (savedName) {
+                userData.first_name = savedName;
+                document.getElementById('ui-user-name').innerText = savedName;
+            } else {
+                // Если имени нет, показываем поле ввода
+                document.getElementById('ui-user-name').style.display = 'none';
+                document.getElementById('web-name-input-group').style.display = 'block';
+            }
+        }
+
         applyLanguage();
+
         let currentSessionType = "", currentModuleNumber = "";
         let globalResults = { date: new Date().toLocaleDateString(), training: { time: "", errors: 0, score: 0 }, tests: { test1: "", test2Score: "", test2Percent: "", test3: "" } };
+
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
         function startModule() {
+            // Проверка имени для Web-версии перед стартом
+            if (!isTgApp && !userData.first_name) {
+                let nameInput = document.getElementById('web-name-input').value.trim();
+                if (!nameInput) {
+                    alert(t('jsAlertName'));
+                    return;
+                }
+                userData.first_name = nameInput;
+                localStorage.setItem('ttm_user_name', nameInput);
+                document.getElementById('ui-user-name').innerText = nameInput;
+                document.getElementById('ui-user-name').style.display = 'inline';
+                document.getElementById('web-name-input-group').style.display = 'none';
+            }
+
             let val = parseInt(document.getElementById('module-input').value);
             currentModuleNumber = val;
             if (val >= 1 && val <= 5) { currentSessionType = "training"; initTraining(); }
             else if (val === 6) { currentSessionType = "tests"; switchScreen('test1-screen'); }
             else alert(t('jsAlertInput'));
         }
+
         function openHelp() { document.getElementById('help-modal').classList.add('active'); }
         function closeHelp() { document.getElementById('help-modal').classList.remove('active'); }
 
@@ -902,18 +943,11 @@
             if (errorsCount > 0) {
                 document.getElementById('errors-list').innerHTML = history.filter(h => !h.isCorrect).map(h => `<div class="history-item"><b>${h.task.a} ${h.task.op} ${h.task.b}</b><br><span class="error-text">${t('jsYourAns')}: ${h.userX}${h.task.op === '/' && h.userY > 0 ? ` ${t('remLabel')} ${h.userY}` : ''}</span><br><span class="correct-text">${t('jsCorrectAns')}: ${h.task.ansX}${h.task.op === '/' && h.task.ansY > 0 ? ` ${t('remLabel')} ${h.task.ansY}` : ''}</span><hr></div>`).join('');
                 document.getElementById('errors-modal').classList.add('active');
-
-                // Ставим фокус на кнопку "Понятно, к итогам"
                 setTimeout(() => { document.getElementById('btn-understand-errors').focus(); }, 100);
-            } else {
-                generateGlobalSummary();
-            }
+            } else { generateGlobalSummary(); }
         }
 
-        function showTrainingSummary() {
-            document.getElementById('errors-modal').classList.remove('active');
-            generateGlobalSummary();
-        }
+        function showTrainingSummary() { document.getElementById('errors-modal').classList.remove('active'); generateGlobalSummary(); }
 
         // ================== ГЛОБАЛЬНЫЙ ВЫВОД И КОПИРОВАНИЕ ==================
         function generateGlobalSummary() {
@@ -930,6 +964,9 @@
                 reportText += `${t('jsT1Name')}: ${globalResults.tests.test1}\n${t('jsT2Name')}: ${globalResults.tests.test2Score} (${globalResults.tests.test2Percent})\n${t('jsT3Name')}: ${globalResults.tests.test3}\n`;
             }
 
+            // Добавляем вирусную ссылку в конец
+            reportText += t('jsViralLink');
+
             document.getElementById('copy-text-area').value = reportText;
             setTimeout(() => { document.getElementById('btn-copy-results').focus(); }, 100);
         }
@@ -945,31 +982,34 @@
         }
 
         // ================== ОБРАБОТЧИК ENTER ==================
-        window.onload = function () { document.getElementById('module-input').focus(); };
+        window.onload = function () {
+            // Если Web-версия и нет имени — ставим фокус на ввод имени, иначе на ввод модуля
+            if (!isTgApp && !userData.first_name) {
+                document.getElementById('web-name-input').focus();
+            } else {
+                document.getElementById('module-input').focus();
+            }
+        };
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
-                // Если фокус на кнопке или поле текста - ничего не делаем, браузер сам нажмет кнопку
                 if (document.activeElement.tagName === 'BUTTON' || document.activeElement.tagName === 'TEXTAREA') return;
 
-                // Если открыто окно ошибок - нажимаем кнопку "Понятно"
                 if (document.getElementById('errors-modal').classList.contains('active')) {
                     e.preventDefault();
                     document.getElementById('btn-understand-errors').click();
                     return;
                 }
 
-                // Если открыто окно итогов - ничего не делаем (там работает фокус)
                 if (document.getElementById('global-summary-modal').classList.contains('active')) return;
 
                 const activeScreen = document.querySelector('.screen.active');
                 if (!activeScreen) return;
 
-                // Логика для экрана тренировки
                 if (activeScreen.id === 'training-screen') {
                     e.preventDefault();
                     let task = tasks[currentIndex];
-                    if (!task) return; // Защита от ошибки после 100-го примера
+                    if (!task) return;
 
                     if (task.op === '/') {
                         if (document.activeElement === inputX) inputY.focus();
@@ -978,15 +1018,12 @@
                     return;
                 }
 
-                // Логика для стартового экрана
                 if (activeScreen.id === 'start-screen') { e.preventDefault(); startModule(); return; }
 
-                // Для остальных экранов (тестов) ищем зеленую/красную кнопку и жмем
                 const primaryBtn = Array.from(activeScreen.querySelectorAll('.btn-next, .btn-stop')).find(btn => window.getComputedStyle(btn).display !== 'none');
                 if (primaryBtn) { e.preventDefault(); primaryBtn.click(); }
             }
 
-            // Логика для Tab (остаток при делении)
             if (e.key === 'Tab' && document.querySelector('.screen.active')?.id === 'training-screen') {
                 if (e.shiftKey && document.activeElement === inputY) { e.preventDefault(); inputX.focus(); }
             }
